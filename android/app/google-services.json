@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "552455772523",
+    "project_id": "pcstudioapp-b3e6f",
+    "storage_bucket": "pcstudioapp-b3e6f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552455772523:android:e568d1cb6a460e2e48d42e",
+        "android_client_info": {
+          "package_name": "com.example.app_studio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552455772523-e3nn1h6bm568ib5971247mqo2p94jeli.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbsFZ3WjJWmzV9oeps0MduaxdOlFrneUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552455772523-e3nn1h6bm568ib5971247mqo2p94jeli.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552455772523:android:cb365dd3601516a448d42e",
+        "android_client_info": {
+          "package_name": "com.pcstudio.pcstudioapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552455772523-2gv6mu23sr6snl3h43c9cluc66gupr1e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pcstudio.pcstudioapp",
+            "certificate_hash": "2cc018ac7758e9d9761d1cc621f594e66dc5cf81"
+          }
+        },
+        {
+          "client_id": "552455772523-e3nn1h6bm568ib5971247mqo2p94jeli.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbsFZ3WjJWmzV9oeps0MduaxdOlFrneUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552455772523-e3nn1h6bm568ib5971247mqo2p94jeli.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
