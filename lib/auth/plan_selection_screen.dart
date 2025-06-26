@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:pc_studio_app/auth/business_register_screen.dart'; // <-- IMPORT ADICIONADO
+import 'package:pc_studio_app/models/plan.dart'; // <-- IMPORT ADICIONADO
 
 // Tela para o usuário selecionar um plano de assinatura.
 class PlanSelectionScreen extends StatelessWidget {
   const PlanSelectionScreen({super.key});
+
+  // Função auxiliar para navegar para a tela de cadastro.
+  void _navigateToRegister(BuildContext context, Plan plan) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BusinessRegisterScreen(selectedPlan: plan),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +38,8 @@ class PlanSelectionScreen extends StatelessWidget {
                 "Aparece nas buscas do app",
               ],
               onTap: () {
-                // Lógica para navegar para a tela de cadastro com o plano selecionado.
+                // --- LÓGICA DE NAVEGAÇÃO ADICIONADA ---
+                _navigateToRegister(context, Plan.free);
               },
             ),
             const SizedBox(height: 16),
@@ -41,7 +54,8 @@ class PlanSelectionScreen extends StatelessWidget {
                 "Links para redes sociais",
               ],
               onTap: () {
-                // Lógica de navegação.
+                // --- LÓGICA DE NAVEGAÇÃO ADICIONADA ---
+                _navigateToRegister(context, Plan.basic);
               },
             ),
             const SizedBox(height: 16),
@@ -56,17 +70,33 @@ class PlanSelectionScreen extends StatelessWidget {
                 "Gerenciamento de agenda online",
               ],
               onTap: () {
-                // Lógica de navegação.
+                // --- LÓGICA DE NAVEGAÇÃO ADICIONADA ---
+                _navigateToRegister(context, Plan.advanced);
               },
             ),
-            // Adicione mais cards para outros planos se necessário.
+            const SizedBox(height: 16),
+            // Card para o Plano Premium.
+            _buildPlanCard(
+              context: context,
+              planName: "Plano Premium",
+              price: "R\$ 69,90/mês",
+              features: [
+                "Tudo do plano Avançado",
+                "Gestão de Estoque e Vendas",
+                "Teste de Tatuagem com AR (Em breve)",
+              ],
+              onTap: () {
+                // --- LÓGICA DE NAVEGAÇÃO ADICIONADA ---
+                _navigateToRegister(context, Plan.premium);
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Widget auxiliar para construir os cards de plano, evitando repetição de código.
+  // Widget auxiliar para construir os cards de plano.
   Widget _buildPlanCard({
     required BuildContext context,
     required String planName,
@@ -99,7 +129,6 @@ class PlanSelectionScreen extends StatelessWidget {
                     color: Colors.purple),
               ),
               const SizedBox(height: 16),
-              // Mapeia a lista de features para uma lista de widgets de texto com um ícone.
               ...features.map((feature) => Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Row(
