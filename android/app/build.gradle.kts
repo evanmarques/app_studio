@@ -1,3 +1,5 @@
+// Conteúdo para o arquivo: android/app/build.gradle.kts
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -11,7 +13,9 @@ plugins {
 android {
     namespace = "com.example.app_studio"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    
+    // ESTA É A LINHA QUE VOCÊ PRECISA ALTERAR
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
