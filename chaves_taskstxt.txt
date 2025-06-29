@@ -1,0 +1,168 @@
+For more details see https://docs.gradle.org/8.12/release-notes.html
+
+
+> Task :app:signingReport
+Variant: debug
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+Variant: release
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+Variant: profile
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+> Task :cloud_firestore:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+> Task :firebase_auth:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+> Task :firebase_core:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+> Task :firebase_storage:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+> Task :flutter_plugin_android_lifecycle:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+> Task :google_sign_in_android:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+> Task :image_picker_android:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+Alias: AndroidDebugKey
+Alias: AndroidDebugKey
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+----------
+
+> Task :url_launcher_android:signingReport
+Variant: debugAndroidTest
+
+> Task :url_launcher_android:signingReport
+Variant: debugAndroidTest
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+Config: debug
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+Store: C:\Users\evan.marques\.android\debug.keystore
+Alias: AndroidDebugKey
+Alias: AndroidDebugKey
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+MD5: B0:AB:88:35:87:EC:26:19:CC:A6:61:F3:B7:6F:EA:98
+SHA1: B4:5F:92:AA:F1:BE:C4:50:09:96:85:FB:76:F5:CF:00:07:EA:BA:6A
+SHA-256: 5F:D8:0C:95:25:DB:12:51:B3:08:5F:73:5D:16:A2:A7:BA:B6:A4:CD:DB:27:94:C0:20:31:9F:2F:80:3A:67:F1
+Valid until: ter├ºa-feira, 22 de junho de 2055
+----------
+
+[Incubating] Problems report is available at: file:///C:/Users/evan.marques/Desktop/Workstation/dev/app_studio/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.12/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.     
+
+BUILD SUCCESSFUL in 3s
+13 actionable tasks: 9 executed, 4 up-to-date
