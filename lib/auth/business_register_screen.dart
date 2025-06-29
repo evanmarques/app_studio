@@ -1,14 +1,16 @@
-import 'dart:io'; // Necessário para trabalhar com arquivos (File)
+// lib/auth/business_register_screen.dart
+
+import 'dart:io'; // Necessário para trabalhar com ficheiros (File), como a imagem de perfil
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // Para guardar ficheiros como imagens
+import 'package:cloud_firestore/cloud_firestore.dart'; // A nossa base de dados NoSQL
+import 'package:image_picker/image_picker.dart'; // Pacote para escolher imagens da galeria ou câmara
 import 'package:pc_studio_app/core/main_navigator.dart';
 import 'package:pc_studio_app/models/artist.dart';
 import 'package:pc_studio_app/models/plan.dart';
 
-// Esta é a tela final do fluxo de cadastro de estúdio.
+// Esta é a tela final do fluxo de registo de estúdio.
 class BusinessRegisterScreen extends StatefulWidget {
   // Ela recebe o plano selecionado da tela anterior.
   final Plan selectedPlan;
@@ -31,8 +33,8 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
   final _whatsappController = TextEditingController();
   final _facebookController = TextEditingController();
 
-  // Variáveis para gerenciar o estado da tela.
-  File? _profileImage; // Armazena o arquivo de imagem selecionado.
+  // Variáveis para gerir o estado do ecrã.
+  File? _profileImage; // Armazena o ficheiro de imagem selecionado.
   bool _isLoading = false; // Controla a exibição do indicador de carregamento.
 
   // Instâncias dos serviços do Firebase para comunicação com o backend.
@@ -42,7 +44,7 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
 
   @override
   void dispose() {
-    // É uma boa prática limpar os controladores quando a tela é descartada para liberar memória.
+    // É uma boa prática limpar os controladores quando o ecrã é descartado para libertar memória.
     _studioNameController.dispose();
     _ownerNameController.dispose();
     _specialtyController.dispose();
@@ -59,7 +61,7 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
         await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
 
     if (pickedFile != null) {
-      // Atualiza o estado da tela para exibir a nova imagem selecionada.
+      // Atualiza o estado do ecrã para exibir a nova imagem selecionada.
       setState(() {
         _profileImage = File(pickedFile.path);
       });
@@ -69,14 +71,16 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
   // Função principal que orquestra o processo de salvar o perfil do estúdio.
   Future<void> _registerStudio() async {
     final user = _auth.currentUser;
-    if (user == null) return; // Garante que há um usuário logado.
+    if (user == null)
+      return; // Garante que há um utilizador com sessão iniciada.
 
     // Validação dos campos obrigatórios.
     if (_studioNameController.text.isEmpty ||
         _ownerNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Por favor, preencha nome do estúdio e seu nome.")),
+            content:
+                Text("Por favor, preencha o nome do estúdio e o seu nome.")),
       );
       return;
     }
@@ -90,9 +94,12 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
       String? imageUrl;
       // 1. Faz o upload da imagem de perfil para o Firebase Storage, se uma foi selecionada.
       if (_profileImage != null) {
+        // Define o caminho no Storage: /profile_images/{user_id}.jpg
         final ref =
             _storage.ref().child('profile_images').child('${user.uid}.jpg');
+        // Envia o ficheiro
         await ref.putFile(_profileImage!);
+        // Pega no URL de download da imagem que acabámos de enviar.
         imageUrl = await ref.getDownloadURL();
       }
 
@@ -101,8 +108,8 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
         uid: user.uid,
         studioName: _studioNameController.text.trim(),
         ownerName: _ownerNameController.text.trim(),
-        email: user.email!, // Pega o email do usuário já autenticado.
-        plan: widget.selectedPlan.name,
+        email: user.email!, // Pega no email do utilizador já autenticado.
+        plan: widget.selectedPlan.name, // 'free', 'basic', etc.
         profileImageUrl: imageUrl,
         specialties: [_specialtyController.text.trim()],
         instagramUrl: _instagramController.text.trim(),
@@ -111,7 +118,7 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
       );
 
       // 3. Salva o perfil do artista no Firestore.
-      // Usamos o UID do usuário como ID do documento para criar um link direto entre a autenticação e o perfil.
+      // Usamos o UID do utilizador como ID do documento para criar um link direto entre a autenticação e o perfil.
       await _firestore
           .collection("studios")
           .doc(user.uid)
@@ -129,7 +136,7 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
         );
       }
     } catch (e) {
-      // Em caso de erro, exibe uma mensagem para o usuário.
+      // Em caso de erro, exibe uma mensagem para o utilizador.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erro ao criar perfil: ${e.toString()}")),
@@ -150,12 +157,13 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
   Widget build(BuildContext context) {
     // Lógica para determinar quais campos devem ser exibidos com base no plano.
     bool showImagePicker = widget.selectedPlan != Plan.free;
+    // CORREÇÃO APLICADA AQUI: widget.selectedPlan != Plan.free
     bool showSocialFields = widget.selectedPlan != Plan.free;
     bool showSpecialty = widget.selectedPlan != Plan.free;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cadastro do Estúdio"),
+        title: const Text("Registo do Estúdio"),
         backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
@@ -190,13 +198,13 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
             const SizedBox(height: 16),
             _buildTextField(
                 controller: _ownerNameController,
-                labelText: "Seu Nome Completo"),
+                labelText: "O seu Nome Completo"),
             const SizedBox(height: 16),
 
             if (showSpecialty)
               _buildTextField(
                   controller: _specialtyController,
-                  labelText: "Sua principal especialidade"),
+                  labelText: "A sua principal especialidade"),
             if (showSpecialty) const SizedBox(height: 16),
 
             if (showSocialFields)
@@ -218,13 +226,12 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
                   labelText: "URL do Facebook"),
             const SizedBox(height: 32),
 
-            // Botão para finalizar o cadastro.
+            // Botão para finalizar o registo.
             MaterialButton(
               minWidth: double.infinity,
               height: 50,
-              onPressed: _isLoading
-                  ? null
-                  : _registerStudio, // Desabilita o botão durante o carregamento.
+              // Desabilita o botão durante o carregamento.
+              onPressed: _isLoading ? null : _registerStudio,
               color: Colors.purple,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -232,7 +239,7 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
                   ? const CircularProgressIndicator(
                       color: Colors.white,
                     )
-                  : const Text("Finalizar Cadastro",
+                  : const Text("Finalizar Registo",
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,

@@ -26,12 +26,14 @@ dev_dependencies:
 
   flutter_lints: ^3.0.0
 
-# A seção a seguir é específica do Flutter.
+# A secção a seguir é específica do Flutter.
 # A indentação aqui é crucial.
 flutter:
   uses-material-design: true
 
-  # Para adicionar assets (como imagens) à sua aplicação, adicione uma seção de assets como esta.
+  # Para adicionar assets (como imagens) à sua aplicação, adicione uma secção de assets como esta.
   # A pasta 'assets' deve existir na raiz do projeto.
   assets:
-    - assets/
+    - assets/logo_facebook.png
+    - assets/logo_instagram.png
+    - assets/logo_whatsapp.png

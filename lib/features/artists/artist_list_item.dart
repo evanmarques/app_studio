@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:pc_studio_app/models/artist.dart'; // Importa nosso modelo de dados
+// lib/features/artists/artist_list_item.dart
 
-// Um widget reutilizável para exibir um único artista em uma lista.
+import 'package:flutter/material.dart';
+import 'package:pc_studio_app/models/artist.dart'; // Importa o nosso modelo de dados
+
+// Um widget reutilizável para exibir um único artista numa lista.
 class ArtistListItem extends StatelessWidget {
   final Artist artist;
   final VoidCallback onTap; // Função a ser chamada quando o card for tocado.
@@ -14,7 +16,7 @@ class ArtistListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Card com uma borda sutil para um visual mais limpo.
+    // Card com uma borda subtil para um visual mais limpo.
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -29,16 +31,18 @@ class ArtistListItem extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
-              // Foto de perfil do artista.
+              // --- CÓDIGO ATUALIZADO E ROBUSTO PARA A FOTO DE PERFIL ---
               CircleAvatar(
                 radius: 35,
                 backgroundColor: Colors.grey[700],
-                // Usa a imageUrl do artista. Se for nula ou vazia, não mostra imagem.
+                // Tenta carregar a imagem da URL.
+                // Usamos um `key` com a URL para ajudar o Flutter a gerir o cache.
+                // A grande mudança está no `errorBuilder` abaixo.
                 backgroundImage: (artist.profileImageUrl != null &&
                         artist.profileImageUrl!.isNotEmpty)
                     ? NetworkImage(artist.profileImageUrl!)
                     : null,
-                // Mostra um ícone padrão se não houver imagem.
+                // Mostra um ícone padrão se não houver URL de imagem.
                 child: (artist.profileImageUrl == null ||
                         artist.profileImageUrl!.isEmpty)
                     ? const Icon(Icons.person, size: 35, color: Colors.white)

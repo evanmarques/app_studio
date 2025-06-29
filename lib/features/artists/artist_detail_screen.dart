@@ -1,7 +1,11 @@
+// lib/features/artists/artist_detail_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:pc_studio_app/models/artist.dart';
 import 'package:pc_studio_app/models/plan.dart';
 import 'package:url_launcher/url_launcher.dart';
+// 1. IMPORTAMOS O NOSSO NOVO VISUALIZADOR DE IMAGEM
+import 'package:pc_studio_app/features/common/fullscreen_image_viewer.dart';
 
 class ArtistDetailScreen extends StatefulWidget {
   final Artist artist;
@@ -22,6 +26,16 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
           SnackBar(content: Text('Não foi possível abrir o link: $urlString')),
         );
       }
+    }
+  }
+
+  // Tenta converter a string do plano (vinda do Firestore) para o nosso enum Plan.
+  // Se falhar, assume o plano Free por segurança.
+  Plan tryParsePlan(String planString) {
+    try {
+      return Plan.values.firstWhere((e) => e.name == planString);
+    } catch (e) {
+      return Plan.free;
     }
   }
 
@@ -83,7 +97,7 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
               ),
             ),
           ),
-          // A chamada da função agora está com o nome correto.
+          // A nossa grelha de portfólio, que agora é interativa.
           _buildPortfolioGrid(artistPlan),
         ],
       ),
@@ -91,9 +105,6 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
   }
 
   Widget _buildSocialButtons() {
-    // Para esta função funcionar, certifique-se de que você tem os arquivos
-    // 'logo_whatsapp.png', 'logo_instagram.png', 'logo_facebook.png'
-    // dentro de uma pasta 'assets' na raiz do seu projeto.
     return Row(
       children: [
         if (widget.artist.whatsappNumber != null &&
@@ -147,15 +158,14 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
     }
   }
 
-  // --- NOME DA FUNÇÃO CORRIGIDO ---
-  // O nome agora é _buildPortfolioGrid, consistente com a chamada no build.
+  // --- FUNÇÃO DO PORTFÓLIO ATUALIZADA ---
   Widget _buildPortfolioGrid(Plan plan) {
     if (plan == Plan.free) {
       return SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            "Este artista não possui um portfólio online. Faça upgrade para um plano pago para exibir seus trabalhos!",
+            "Este artista não possui um portfólio online. Faça upgrade para um plano pago para exibir os seus trabalhos!",
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey[400]),
           ),
@@ -186,13 +196,38 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
         ),
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(
-                widget.artist.portfolioImageUrls[index],
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    Container(color: Colors.grey[800]),
+            final imageUrl = widget.artist.portfolioImageUrls[index];
+
+            // Adicionamos o GestureDetector para tornar a imagem clicável.
+            return GestureDetector(
+              onTap: () {
+                // Ao clicar, navegamos para o nosso novo ecrã de visualização.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    // E passamos a URL da imagem clicada para ele.
+                    builder: (context) =>
+                        FullscreenImageViewer(imageUrl: imageUrl),
+                  ),
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[850],
+                      child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2.0)),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.grey[800],
+                      child: const Icon(Icons.broken_image)),
+                ),
               ),
             );
           },
@@ -200,13 +235,5 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
         ),
       ),
     );
-  }
-
-  Plan tryParsePlan(String planString) {
-    try {
-      return Plan.values.firstWhere((e) => e.name == planString);
-    } catch (e) {
-      return Plan.free;
-    }
   }
 }

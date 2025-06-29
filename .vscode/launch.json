@@ -1,16 +1,26 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "type": "chrome",
+            // Configuração para rodar no seu Smartphone (Android ou iOS)
+            // ou em um emulador.
+            "name": "Flutter (Mobile)",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
+            "type": "dart",
+            "flutterMode": "debug",
+            // Esta linha garante que o Console de Depuração sempre abrirá.
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            // Configuração para rodar especificamente no Google Chrome
+            // usando o Flutter para Web.
+            "name": "Flutter (Chrome)",
+            "request": "launch",
+            "type": "dart",
+            // "deviceId": "chrome" diz ao Flutter para iniciar uma sessão web.
+            "deviceId": "chrome",
+            "flutterMode": "debug",
+            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }
