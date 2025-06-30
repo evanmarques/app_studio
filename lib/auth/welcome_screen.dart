@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:pc_studio_app/auth/login_screen.dart';
 import 'package:pc_studio_app/auth/signup_screen.dart';
 import 'package:pc_studio_app/auth/auth_service.dart';
+// Importa o pacote FontAwesome para usar os ícones de marcas.
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-// Versão FINAL e COMPLETA
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
@@ -14,22 +15,30 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  // Estado para controlar o loading do login com Google.
   bool _isLoading = false;
+  // Instância do nosso serviço de autenticação.
   final AuthService _authService = AuthService();
 
+  // Função para lidar com o login do Google.
   void _handleGoogleSignIn() async {
+    // Ativa o indicador de progresso e desabilita os botões.
     setState(() {
       _isLoading = true;
     });
     try {
+      // Chama o método de login do nosso serviço.
       await _authService.signInWithGoogle();
+      // O AuthGate tratará da navegação se o login for bem-sucedido.
     } catch (e) {
+      // Se ocorrer um erro, exibe uma mensagem para o usuário.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao fazer login com Google: $e')),
         );
       }
     } finally {
+      // Garante que o indicador de progresso seja desativado no final.
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -44,21 +53,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // IMAGEM DE FUNDO
+          // Imagem de fundo.
           Image.asset(
-            'assets/images/dragon.png', // O caminho para a imagem
+            'assets/images/dragao.png',
             fit: BoxFit.cover,
             color: Colors.black.withOpacity(0.5),
             colorBlendMode: BlendMode.darken,
           ),
 
-          // INDICADOR DE PROGRESSO
+          // Indicador de progresso centralizado.
           if (_isLoading)
             const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
 
-          // CONTEÚDO PRINCIPAL
+          // Conteúdo principal da tela.
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
@@ -66,7 +75,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Título
+                  // Texto de boas-vindas.
                   const Column(
                     children: <Widget>[
                       Text(
@@ -90,37 +99,51 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                   const Spacer(),
 
-                  // Botões
+                  // Botões de ação.
                   Column(
                     children: <Widget>[
-                      // BOTÃO DE LOGIN COM GOOGLE
-                      MaterialButton(
-                        minWidth: double.infinity,
-                        height: 60,
-                        onPressed: _isLoading ? null : _handleGoogleSignIn,
-                        color: const Color(0xFFDB4437),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.g_mobiledata,
-                                color: Colors.white, size: 30),
-                            SizedBox(width: 10),
-                            Text(
-                              "Entrar com Google",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
+                      const Text(
+                        "Entre com suas redes sociais",
+                        style: TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 20),
-                      // BOTÃO DE LOGIN COM E-MAIL
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Usando ícones do pacote FontAwesome para evitar erros de assets não encontrados.
+                          _buildSocialButton(
+                            icon: FontAwesomeIcons.google,
+                            onTap: _isLoading ? () {} : _handleGoogleSignIn,
+                          ),
+                          const SizedBox(width: 20),
+                          _buildSocialButton(
+                            icon: FontAwesomeIcons.instagram,
+                            onTap: () {
+                              // TODO: Implementar login com Instagram
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Login com Instagram a ser implementado.')),
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 20),
+                          _buildSocialButton(
+                            icon: FontAwesomeIcons.facebook,
+                            onTap: () {
+                              // TODO: Implementar login com Facebook
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Login com Facebook a ser implementado.')),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+
+                      // Botões de login e registro com e-mail.
                       MaterialButton(
                         minWidth: double.infinity,
                         height: 60,
@@ -144,7 +167,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // BOTÃO DE REGISTAR
                       MaterialButton(
                         minWidth: double.infinity,
                         height: 60,
@@ -175,6 +197,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Widget auxiliar para criar os botões sociais redondos.
+  Widget _buildSocialButton(
+      {required IconData icon, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(25),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 1),
+        ),
+        child: FaIcon(
+          icon,
+          color: Colors.white,
+          size: 24,
+        ),
       ),
     );
   }

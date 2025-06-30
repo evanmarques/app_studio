@@ -1,9 +1,10 @@
+// lib/auth/login_screen.dart
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pc_studio_app/auth/signup_screen.dart';
 import 'package:pc_studio_app/core/main_navigator.dart';
 
-// Converte para StatefulWidget para gerenciar o estado dos campos e do loading.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -34,6 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signIn() async {
     // Esconde o teclado.
     FocusScope.of(context).unfocus();
+
+    // Validação básica para não fazer chamadas vazias ao Firebase.
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, preencha e-mail e senha.')),
+      );
+      return;
+    }
 
     // Ativa o indicador de carregamento.
     setState(() {
@@ -69,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       // Trata outros erros genéricos.
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text("Ocorreu um erro: ${e.toString()}")),
       );
     }
 
@@ -81,10 +90,22 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Função para a recuperação de senha.
+  void _forgotPassword() {
+    // TODO: Implementar a lógica de recuperação de senha.
+    // Ex: Mostrar um dialog para inserir o email e enviar o link de reset.
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content:
+              Text('Funcionalidade de recuperar senha a ser implementada.')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // Evita que os widgets sejam redimensionados quando o teclado aparece.
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -93,16 +114,30 @@ class _LoginScreenState extends State<LoginScreen> {
           icon: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.white),
         ),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
+      // Corpo da tela envolto por um Stack para adicionar a imagem de fundo.
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // --- 1. IMAGEM DE FUNDO ---
+          Image.asset(
+            'assets/images/dragao.png', // Caminho da imagem de fundo
+            fit: BoxFit.cover,
+            // Aplica um filtro escuro para melhorar a legibilidade do conteúdo.
+            color: Colors.black.withOpacity(0.6),
+            colorBlendMode: BlendMode.darken,
+          ),
+          // SingleChildScrollView permite que o conteúdo role se não couber na tela (com teclado aberto).
+          SingleChildScrollView(
+            child: SizedBox(
+              // Define a altura para ocupar a tela inteira.
+              height: MediaQuery.of(context).size.height -
+                  kToolbarHeight -
+                  MediaQuery.of(context).padding.top,
+              width: double.infinity,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
+                  // Coluna para o título da tela.
                   const Column(
                     children: <Widget>[
                       Text("Login",
@@ -113,11 +148,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(fontSize: 15, color: Colors.grey)),
                     ],
                   ),
+                  // Padding para os campos de entrada e botão.
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
                       children: <Widget>[
-                        // Conecta os campos aos seus controladores.
+                        // Campo de Email.
                         TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -128,6 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        // Campo de Senha.
                         TextField(
                           controller: _passwordController,
                           obscureText: true,
@@ -137,32 +174,48 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
+                        const SizedBox(height: 10),
+
+                        // --- 2. BOTÃO "ESQUECI A SENHA" ---
+                        // Alinhado à direita para seguir o padrão de design.
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: _isLoading ? null : _forgotPassword,
+                              child: const Text(
+                                "Esqueci a senha?",
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Botão de Entrar.
+                        MaterialButton(
+                          minWidth: double.infinity,
+                          height: 60,
+                          onPressed: _isLoading ? null : _signIn,
+                          color: Colors.purple,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50)),
+                          // Mostra o indicador de loading dentro do botão.
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
+                              : const Text(
+                                  "Entrar",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18,
+                                      color: Colors.white),
+                                ),
+                        ),
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: MaterialButton(
-                      minWidth: double.infinity,
-                      height: 60,
-                      onPressed: _isLoading
-                          ? null
-                          : _signIn, // Desabilita durante o loading.
-                      color: Colors.purple,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50)),
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              "Entrar",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                  color: Colors.white),
-                            ),
-                    ),
-                  ),
+                  // Link para a tela de Cadastro.
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -186,8 +239,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
