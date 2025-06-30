@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:pc_studio_app/models/artist.dart';
 import 'package:pc_studio_app/models/plan.dart';
 import 'package:url_launcher/url_launcher.dart';
-// 1. IMPORTAMOS O NOSSO NOVO VISUALIZADOR DE IMAGEM
 import 'package:pc_studio_app/features/common/fullscreen_image_viewer.dart';
 
 class ArtistDetailScreen extends StatefulWidget {
@@ -17,7 +16,6 @@ class ArtistDetailScreen extends StatefulWidget {
 }
 
 class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
-  // Função auxiliar para abrir URLs de forma segura.
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -29,8 +27,6 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
     }
   }
 
-  // Tenta converter a string do plano (vinda do Firestore) para o nosso enum Plan.
-  // Se falhar, assume o plano Free por segurança.
   Plan tryParsePlan(String planString) {
     try {
       return Plan.values.firstWhere((e) => e.name == planString);
@@ -97,7 +93,6 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
               ),
             ),
           ),
-          // A nossa grelha de portfólio, que agora é interativa.
           _buildPortfolioGrid(artistPlan),
         ],
       ),
@@ -110,16 +105,21 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
         if (widget.artist.whatsappNumber != null &&
             widget.artist.whatsappNumber!.isNotEmpty)
           _socialButton(
-              'assets/logo_whatsapp.png',
+              // ATUALIZADO: Novo caminho para o ícone
+              'assets/icons/logo_whatsapp.png',
               () =>
                   _launchUrl('https://wa.me/${widget.artist.whatsappNumber}')),
         if (widget.artist.instagramUrl != null &&
             widget.artist.instagramUrl!.isNotEmpty)
-          _socialButton('assets/logo_instagram.png',
+          _socialButton(
+              // ATUALIZADO: Novo caminho para o ícone
+              'assets/icons/logo_instagram.png',
               () => _launchUrl(widget.artist.instagramUrl!)),
         if (widget.artist.facebookUrl != null &&
             widget.artist.facebookUrl!.isNotEmpty)
-          _socialButton('assets/logo_facebook.png',
+          _socialButton(
+              // ATUALIZADO: Novo caminho para o ícone
+              'assets/icons/logo_facebook.png',
               () => _launchUrl(widget.artist.facebookUrl!)),
       ],
     );
@@ -158,7 +158,6 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
     }
   }
 
-  // --- FUNÇÃO DO PORTFÓLIO ATUALIZADA ---
   Widget _buildPortfolioGrid(Plan plan) {
     if (plan == Plan.free) {
       return SliverToBoxAdapter(
@@ -197,15 +196,11 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
             final imageUrl = widget.artist.portfolioImageUrls[index];
-
-            // Adicionamos o GestureDetector para tornar a imagem clicável.
             return GestureDetector(
               onTap: () {
-                // Ao clicar, navegamos para o nosso novo ecrã de visualização.
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    // E passamos a URL da imagem clicada para ele.
                     builder: (context) =>
                         FullscreenImageViewer(imageUrl: imageUrl),
                   ),

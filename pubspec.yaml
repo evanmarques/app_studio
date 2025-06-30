@@ -25,15 +25,22 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: "^0.13.1"
 
-# A secção a seguir é específica do Flutter.
-# A indentação aqui é crucial.
+# A secção do Flutter DEVE ter esta indentação exata.
 flutter:
   uses-material-design: true
 
-  # Para adicionar assets (como imagens) à sua aplicação, adicione uma secção de assets como esta.
-  # A pasta 'assets' deve existir na raiz do projeto.
+  # A secção de assets DEVE estar indentada sob 'flutter:'.
   assets:
-    - assets/logo_facebook.png
-    - assets/logo_instagram.png
-    - assets/logo_whatsapp.png
+    # CADA LINHA DEVE TER EXATAMENTE DOIS ESPAÇOS ANTES DO HÍFEN.
+    # A barra no final (/) inclui todos os ficheiros da pasta.
+    - assets/images/
+    - assets/icons/
+
+# A secção flutter_launcher_icons deve estar na raiz do ficheiro (sem indentação).
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/ic_launcher_playstore.png"
+  min_sdk_android: 21
