@@ -10,6 +10,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Dependência para localização.
+  flutter_localizations:
+    sdk: flutter
+
   # Dependências do Firebase
   firebase_core: ^2.32.0
   firebase_auth: ^4.20.0
@@ -21,8 +25,14 @@ dependencies:
   image_picker: ^1.1.2
   url_launcher: ^6.3.0
   
-  # Pacote de Ícones que estamos adicionando
-  font_awesome_flutter: ^10.7.0 # <-- ESTA É A LINHA ADICIONADA
+  # Dependências para Calendário e Datas
+  table_calendar: ^3.1.2 
+  
+  # Versão do intl atualizada para ser compatível com flutter_localizations
+  intl: ^0.20.0
+
+  # Pacote de Ícones
+  font_awesome_flutter: ^10.7.0
 
   # Ícone padrão do Cupertino
   cupertino_icons: ^1.0.6
@@ -30,22 +40,15 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^3.0.0
   flutter_launcher_icons: "^0.13.1"
 
-# A secção do Flutter DEVE ter esta indentação exata.
 flutter:
   uses-material-design: true
-
-  # A secção de assets DEVE estar indentada sob 'flutter:'.
   assets:
-    # CADA LINHA DEVE TER EXATAMENTE DOIS ESPAÇOS ANTES DO HÍFEN.
-    # A barra no final (/) inclui todos os ficheiros da pasta.
     - assets/images/
     - assets/icons/
 
-# A secção flutter_launcher_icons deve estar na raiz do ficheiro (sem indentação).
 flutter_launcher_icons:
   android: true
   ios: true

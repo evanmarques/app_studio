@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pc_studio_app/auth/plan_selection_screen.dart';
+import 'package:pc_studio_app/auth/welcome_screen.dart'; // 1. IMPORTAMOS A WELCOME_SCREEN
 import 'package:pc_studio_app/management/artist_dashboard_screen.dart';
 import 'package:pc_studio_app/admin/admin_screen.dart';
 
@@ -15,25 +16,43 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Instâncias dos serviços do Firebase
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Função para fazer logout
+  // 2. FUNÇÃO DE LOGOUT ATUALIZADA PARA SER MAIS ROBUSTA
   Future<void> _signOut() async {
-    // Faz o logout do Firebase Authentication
-    await _auth.signOut();
-    // O nosso AuthGate irá detetar esta alteração e redirecionar para a tela de boas-vindas.
+    try {
+      // É uma boa prática guardar referências a 'context' antes de uma operação 'await'.
+      final navigator = Navigator.of(context);
+
+      // Primeiro, fazemos o logout do Firebase.
+      await _auth.signOut();
+      await _auth.currentUser?.reload(); // Garante que o estado seja atualizado
+
+      // Depois do logout, navegamos explicitamente para a tela de boas-vindas
+      // e removemos todas as telas anteriores da pilha de navegação.
+      // Isto força uma reconstrução limpa da UI, evitando o crash.
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        (Route<dynamic> route) => false, // Predicado que remove todas as rotas
+      );
+    } catch (e) {
+      // Se houver um erro, mostramos ao utilizador.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao fazer logout: ${e.toString()}")),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Obtém o utilizador atualmente com sessão iniciada
     final currentUser = _auth.currentUser;
 
-    // Se por alguma razão não houver um utilizador (pouco provável, pois o AuthGate protege esta tela),
-    // mostramos uma tela de carregamento para evitar erros.
     if (currentUser == null) {
+      // Este é um estado de segurança. Se o utilizador for nulo,
+      // mostramos um loading enquanto o AuthGate faz o seu trabalho.
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
@@ -43,11 +62,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          // Adiciona um botão de "Sair" diretamente na AppBar para um acesso mais fácil
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',
-            onPressed: _signOut,
+            onPressed: _signOut, // Chama a nossa nova função robusta
           ),
         ],
       ),
@@ -55,39 +73,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            // --- AVATAR DINÂMICO ---
-            // Se o utilizador tiver uma foto de perfil (vinda da conta Google), mostramo-la.
-            // Senão, mostramos a primeira letra do seu nome.
             CircleAvatar(
               radius: 50,
               backgroundImage: currentUser.photoURL != null
                   ? NetworkImage(currentUser.photoURL!)
                   : null,
               child: currentUser.photoURL == null
-                  // LÓGICA CORRIGIDA AQUI:
                   ? Text(
-                      // 1. VERIFICA se o nome NÃO é nulo E NÃO está vazio
                       (currentUser.displayName != null &&
                               currentUser.displayName!.isNotEmpty)
-                          // Se for verdade, pega na primeira letra do nome
                           ? currentUser.displayName!
                               .substring(0, 1)
                               .toUpperCase()
-                          // 2. Se o nome falhar, VERIFICA se o e-mail NÃO é nulo E NÃO está vazio
                           : (currentUser.email != null &&
                                   currentUser.email!.isNotEmpty)
-                              // Se for verdade, pega na primeira letra do e-mail
                               ? currentUser.email!.substring(0, 1).toUpperCase()
-                              // 3. Se tudo falhar, mostra 'U' de Utilizador como fallback
                               : 'U',
                       style: const TextStyle(fontSize: 40),
                     )
                   : null,
             ),
             const SizedBox(height: 16),
-
-            // --- NOME E E-MAIL DINÂMICOS ---
-            // Mostra o nome do utilizador. Se não houver, mostra o e-mail.
             Text(
               currentUser.displayName ??
                   currentUser.email ??
@@ -96,15 +102,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            // Mostra o e-mail do utilizador
             Text(
               currentUser.email ?? 'Nenhum e-mail',
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            const Spacer(), // Ocupa o espaço vazio no meio da tela
-
-            // Este StreamBuilder ouve as mudanças nos dados do utilizador e do estúdio
-            // para decidir quais botões mostrar em tempo real. Esta lógica já estava correta.
+            const Spacer(),
+            // 3. O RESTO DO CÓDIGO PERMANECE IGUAL
             StreamBuilder<DocumentSnapshot>(
               stream: _db.collection('users').doc(currentUser.uid).snapshots(),
               builder: (context, userSnapshot) {
@@ -134,10 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Mostra o botão de admin SE o utilizador for admin.
                         if (isAdmin) _buildAdminButton(),
-
-                        // Mostra os botões de artista SE for artista, senão, mostra o de criar perfil.
                         if (isArtist)
                           _buildArtistManagementButtons()
                         else
@@ -148,7 +148,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 );
               },
             ),
-
             const SizedBox(height: 16),
           ],
         ),
@@ -156,7 +155,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Widget que constrói o botão para criar perfil de estúdio.
   Widget _buildCreateProfileButton() {
     return ElevatedButton(
       onPressed: () {
@@ -175,7 +173,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Widget que constrói os botões de gestão para artistas.
   Widget _buildArtistManagementButtons() {
     return ElevatedButton.icon(
       icon: const Icon(Icons.dashboard),
@@ -189,7 +186,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Widget que constrói o botão do painel de administrador.
   Widget _buildAdminButton() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),

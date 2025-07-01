@@ -42,24 +42,26 @@ O projeto utilizará um modelo de negócio "Freemium", gerando receita através 
     * [✓] Criação da estrutura de navegação principal com `BottomNavigationBar`.
     * [✓] Desenvolvimento das telas estáticas (placeholders) para Início, Artistas, Agenda e Perfil.
 
-* **Fase 3: Autenticação de Usuários (PRÓXIMO PASSO)**
-    * [ ] Implementação da tela de "Splash" para verificar o status de login.
-    * [ ] Desenvolvimento do fluxo completo de autenticação com E-mail/Senha.
-    * [ ] Implementação do fluxo de "Login com Google".
-    * [ ] Criação da coleção `users` no Firestore.
+* **Fase 3: Autenticação de Utilizadores (CONCLUÍDO)**
+    * [✓] Implementação da tela de "Splash" (AuthGate) para verificar o status de login.
+    * [✓] Desenvolvimento do fluxo completo de autenticação com E-mail/Senha.
+    * [✓] Implementação do fluxo de "Login com Google".
+    * [✓] Criação da coleção `users` no Firestore.
 
-* **Fase 4: Perfis e Gerenciamento do Artista**
-    * [ ] Lógica na tela de Perfil para exibir botões de "Cadastrar Estúdio" ou "Gerenciar Perfil".
-    * [ ] Desenvolvimento do fluxo de cadastro de estúdio (seleção de plano, formulário, upload de imagem).
+* **Fase 4: Perfis e Gerenciamento do Artista (EM ANDAMENTO)**
+    * [✓] Lógica na tela de Perfil para exibir botões de "Cadastrar Estúdio" ou "Gerenciar Perfil".
+    * [✓] Desenvolvimento do fluxo de cadastro de estúdio (seleção de plano, formulário, upload de imagem).
+    * [✓] Implementação da tela de gerenciamento de portfólio (adicionar/remover fotos).
     * [ ] Desenvolvimento da tela "Editar Perfil" para artistas.
-    * [ ] Implementação da tela de gerenciamento de portfólio (adicionar/remover fotos).
 
-* **Fase 5: Funcionalidades Centrais**
-    * [ ] Exibição das listas de estilos e artistas com dados do Firestore.
-    * [ ] Implementação da tela de detalhes do artista.
+* **Fase 5: Funcionalidades Centrais (PRÓXIMO PASSO)**
+    * [✓] Exibição das listas de artistas com dados do Firestore.
+    * [✓] Implementação da tela de detalhes do artista.
+    * [ ] Implementação do visualizador de imagens em tela cheia na Home.
     * [ ] Desenvolvimento completo do sistema de agendamento (lado do artista e do cliente).
 
 ### Versão 2.0 (Recursos Avançados e Premium)
 
-* **Gestão de Estoque:** Implementar a funcionalidade do plano Premium para que os estúdios possam gerenciar produtos (pomadas, vestuário, etc.).
-* **Teste de Tatuagem com Realidade Aumentada (AR/IA):** Desenvolver o recurso inovador que permite aos usuários visualizar uma tatuagem em seu corpo usando a câmera do celular, como um "decalque digital".
+* **Autenticação Social Adicional:** Implementar login com Facebook e Instagram.
+* **Gestão de Estoque:** Implementar a funcionalidade do plano Premium.
+* **Teste de Tatuagem com Realidade Aumentada (AR/IA):** Desenvolver o recurso inovador.

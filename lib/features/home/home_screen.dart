@@ -2,25 +2,20 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+// 1. IMPORTAMOS O NOSSO WIDGET REUTILIZÁVEL DE TELA CHEIA
+import 'package:pc_studio_app/features/common/fullscreen_image_viewer.dart';
 
-// Modelo para representar um estilo de tatuagem, agora com um construtor
-// de fábrica para converter dados do Firestore em um objeto Dart.
+// Modelo para representar um estilo de tatuagem.
 class TattooStyle {
   final String name;
-  final String imageUrl; // Alterado de imagePath para imageUrl
+  final String imageUrl;
 
   TattooStyle({required this.name, required this.imageUrl});
 
-  // Construtor de fábrica: Cria uma instância de TattooStyle a partir de um snapshot do Firestore.
-  // Um "mapa" (Map) é uma estrutura de chave-valor, exatamente como um documento do Firestore.
   factory TattooStyle.fromFirestore(Map<String, dynamic> data) {
     return TattooStyle(
-      name:
-          data['name'] ??
-          'Sem Nome', // Pega o valor do campo 'name', ou usa um padrão
-      imageUrl:
-          data['imageUrl'] ??
-          '', // Pega o valor do campo 'imageUrl', ou usa um padrão
+      name: data['name'] ?? 'Sem Nome',
+      imageUrl: data['imageUrl'] ?? '',
     );
   }
 }
@@ -34,7 +29,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Instância do Firestore para que possamos fazer consultas.
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
@@ -42,47 +36,35 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Encontre seu Estilo',
+          'Encontre o seu Estilo',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      // O StreamBuilder é um widget fantástico que se reconstrói sempre que
-      // chegam novos dados do stream (nossa coleção 'styles' do Firestore).
+      // O StreamBuilder ouve as mudanças na coleção 'styles' do Firestore.
       body: StreamBuilder<QuerySnapshot>(
-        // O stream que vamos ouvir: a coleção 'styles' ordenada pelo nome.
         stream: _firestore.collection('styles').orderBy('name').snapshots(),
-        // O builder é chamado toda vez que o estado do stream muda (carregando, com dados, com erro).
         builder: (context, snapshot) {
-          // 1. Se o snapshot tem um erro (ex: sem permissão de acesso).
           if (snapshot.hasError) {
             return const Center(
               child: Text('Ocorreu um erro ao carregar os dados.'),
             );
           }
 
-          // 2. Se está esperando os dados chegarem.
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Mostra uma animação de carregamento no centro da tela.
             return const Center(child: CircularProgressIndicator());
           }
 
-          // 3. Se não tem dados ou a coleção está vazia.
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('Nenhum estilo encontrado.'));
           }
 
-          // 4. Se tudo deu certo, temos os dados!
-          // Mapeamos a lista de documentos (docs) para uma lista de objetos TattooStyle.
           final styles = snapshot.data!.docs.map((doc) {
-            // Pega os dados do documento como um Map<String, dynamic>.
             final data = doc.data() as Map<String, dynamic>;
-            // Usa nosso construtor de fábrica para criar o objeto.
             return TattooStyle.fromFirestore(data);
           }).toList();
 
-          // Retorna a grade, agora com os dados vindos do Firebase.
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -93,11 +75,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSpacing: 16,
                   childAspectRatio: 0.8,
                 ),
-                itemCount: styles
-                    .length, // O total de itens é o tamanho da lista 'styles'.
+                itemCount: styles.length,
                 itemBuilder: (context, index) {
                   final style = styles[index];
-                  // Chama a função que constrói o card para cada item.
+                  // Passamos a chamar o nosso widget de card atualizado.
                   return _buildStyleCard(context, style);
                 },
               ),
@@ -108,47 +89,61 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // O widget que constrói cada card de estilo.
-  // Note a mudança de Image.asset para Image.network.
+  // Widget que constrói cada card de estilo, agora interativo.
   Widget _buildStyleCard(BuildContext context, TattooStyle style) {
+    // 2. ENVOLVEMOS O CARD COM UM GESTUREDETECTOR PARA TORNÁ-LO CLICÁVEL
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Você selecionou: ${style.name}')),
-        );
+        // 3. AO CLICAR, NAVEGAMOS PARA O NOSSO VISUALIZADOR DE TELA CHEIA
+        // Verificamos se a URL da imagem não está vazia antes de navegar.
+        if (style.imageUrl.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  FullscreenImageViewer(imageUrl: style.imageUrl),
+            ),
+          );
+        } else {
+          // Se não houver imagem, podemos mostrar uma mensagem (opcional).
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Imagem não disponível para ${style.name}')),
+          );
+        }
       },
       child: Card(
         color: Colors.grey[900],
-        clipBehavior: Clip.antiAlias,
+        clipBehavior: Clip
+            .antiAlias, // Garante que a imagem não "vaze" para fora das bordas arredondadas
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              // Usamos Image.network para carregar a imagem a partir de uma URL da internet.
-              child: Image.network(
-                style.imageUrl,
-                fit: BoxFit.cover,
-                // Enquanto a imagem da rede carrega, mostramos uma animação.
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    color: Colors.grey[850],
-                    child: const Center(child: CircularProgressIndicator()),
-                  );
-                },
-                // Se der erro ao carregar a imagem da URL.
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[800],
-                    child: const Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        color: Colors.white54,
+              // Usamos um Hero para uma animação de transição suave (opcional, mas elegante).
+              // A 'tag' deve ser única para cada imagem na tela.
+              child: Hero(
+                tag: 'style_image_${style.name}',
+                child: Image.network(
+                  style.imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[850],
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[800],
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported,
+                            color: Colors.white54),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
             Padding(

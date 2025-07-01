@@ -5,6 +5,8 @@ import 'package:pc_studio_app/models/artist.dart';
 import 'package:pc_studio_app/models/plan.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pc_studio_app/features/common/fullscreen_image_viewer.dart';
+// 1. IMPORTAMOS O NOSSO NOVO ECRÃ DE AGENDAMENTO
+import 'package:pc_studio_app/features/appointments/booking_screen.dart';
 
 class ArtistDetailScreen extends StatefulWidget {
   final Artist artist;
@@ -83,6 +85,7 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
                   const SizedBox(height: 16),
                   _buildSocialButtons(),
                   const SizedBox(height: 24),
+                  // O botão de agendamento agora leva para a nova tela.
                   _buildScheduleButton(artistPlan),
                   const SizedBox(height: 24),
                   Text(
@@ -105,21 +108,16 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
         if (widget.artist.whatsappNumber != null &&
             widget.artist.whatsappNumber!.isNotEmpty)
           _socialButton(
-              // ATUALIZADO: Novo caminho para o ícone
               'assets/icons/logo_whatsapp.png',
               () =>
                   _launchUrl('https://wa.me/${widget.artist.whatsappNumber}')),
         if (widget.artist.instagramUrl != null &&
             widget.artist.instagramUrl!.isNotEmpty)
-          _socialButton(
-              // ATUALIZADO: Novo caminho para o ícone
-              'assets/icons/logo_instagram.png',
+          _socialButton('assets/icons/logo_instagram.png',
               () => _launchUrl(widget.artist.instagramUrl!)),
         if (widget.artist.facebookUrl != null &&
             widget.artist.facebookUrl!.isNotEmpty)
-          _socialButton(
-              // ATUALIZADO: Novo caminho para o ícone
-              'assets/icons/logo_facebook.png',
+          _socialButton('assets/icons/logo_facebook.png',
               () => _launchUrl(widget.artist.facebookUrl!)),
       ],
     );
@@ -139,6 +137,7 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
     );
   }
 
+  /// Constrói o botão de agendamento, que agora navega para a [BookingScreen].
   Widget _buildScheduleButton(Plan plan) {
     if (plan == Plan.advanced || plan == Plan.premium) {
       return ElevatedButton.icon(
@@ -147,7 +146,14 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
         style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 50)),
         onPressed: () {
-          /* Lógica para navegar para BookingActivity virá aqui */
+          // 2. AÇÃO DE NAVEGAÇÃO IMPLEMENTADA AQUI
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              // Passa o objeto 'artist' completo para a tela de agendamento.
+              builder: (context) => BookingScreen(artist: widget.artist),
+            ),
+          );
         },
       );
     } else {

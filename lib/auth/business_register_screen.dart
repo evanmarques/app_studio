@@ -71,8 +71,9 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
   // Função principal que orquestra o processo de salvar o perfil do estúdio.
   Future<void> _registerStudio() async {
     final user = _auth.currentUser;
-    if (user == null)
+    if (user == null) {
       return; // Garante que há um utilizador com sessão iniciada.
+    }
 
     // Validação dos campos obrigatórios.
     if (_studioNameController.text.isEmpty ||

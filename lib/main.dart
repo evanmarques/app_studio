@@ -2,22 +2,28 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:pc_studio_app/auth/auth_gate.dart'; // Importa nosso novo "porteiro"
+import 'package:pc_studio_app/auth/auth_gate.dart';
 import 'firebase_options.dart';
+
+// Importações para formatação de data/hora em português
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 // A função 'main' é o ponto de partida de todo aplicativo Flutter.
 Future<void> main() async {
-  // Garante que todos os 'bindings' do Flutter foram inicializados antes de rodar o app.
-  // Essencial para usar o Firebase antes do runApp.
+  // 1. Garante que o Flutter está pronto para rodar código antes de exibir a UI.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializa o Firebase usando as configurações do arquivo firebase_options.dart.
-  // O 'await' pausa a execução aqui até que o Firebase esteja pronto.
+  // 2. Inicializa o Firebase.
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Roda o aplicativo.
+  // 3. INICIALIZA A LOCALIZAÇÃO GLOBALMENTE (A CORREÇÃO DO ERRO!)
+  // Carrega os dados de formatação para Português (Brasil) para TODO o app.
+  await initializeDateFormatting('pt_BR', null);
+
+  // 4. Roda o aplicativo, agora com tudo preparado.
   runApp(const MyApp());
 }
 
@@ -28,19 +34,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PC Studio App',
-      // Remove a faixa de "Debug" no canto superior direito.
+      title: 'Studio App',
       debugShowCheckedModeBanner: false,
 
-      // Define o tema geral do aplicativo.
       theme: ThemeData(
-        brightness: Brightness.dark, // Tema escuro.
-        primarySwatch: Colors.purple, // Cor primária para componentes.
-        scaffoldBackgroundColor: Colors.black, // Cor de fundo padrão.
-        useMaterial3: true, // Usa o design mais recente do Material.
+        brightness: Brightness.dark,
+        primarySwatch: Colors.purple,
+        scaffoldBackgroundColor: Colors.black,
+        useMaterial3: true,
       ),
 
-      // A tela inicial agora é o AuthGate, que decidirá qual tela mostrar (Boas-Vindas ou Principal).
+      // --- CONFIGURAÇÃO DE LOCALIZAÇÃO DO APP ---
+      // Informa ao Flutter para usar as regras de localização que carregamos.
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      // Define os idiomas que o seu aplicativo suporta.
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+      ],
+      // Define o português do Brasil como o idioma padrão.
+      locale: const Locale('pt', 'BR'),
+
       home: const AuthGate(),
     );
   }
