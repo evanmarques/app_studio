@@ -5,11 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pc_studio_app/models/artist.dart';
 import 'package:pc_studio_app/models/appointment.dart';
-import 'package:pc_studio_app/models/user.dart' as AppUser;
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-// A importação abaixo não é mais necessária aqui, mas não causa erro.
-import 'package:intl/date_symbol_data_local.dart';
 
 class BookingScreen extends StatefulWidget {
   final Artist artist;
@@ -41,17 +38,22 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   void initState() {
     super.initState();
-    // REMOVIDO: A inicialização agora é global no main.dart e não é mais necessária aqui.
-    // initializeDateFormatting('pt_BR', null);
+    // A inicialização global no main.dart já cuida disso.
     if (_isDayEnabled(DateTime.now())) {
       _selectedDay = _focusedDay;
       _generateAvailableTimeSlots(_selectedDay!);
     }
   }
 
+  // A lógica desta função está correta, mas ela retorna 'false' para todos os dias
+  // se a lista 'workingDays' do artista estiver vazia.
   bool _isDayEnabled(DateTime day) {
+    if (widget.artist.workingDays.isEmpty) {
+      return false; // Se a lista de dias de trabalho estiver vazia, desabilita todos os dias.
+    }
     final enabledWeekdays = widget.artist.workingDays
         .map((dayString) => _dayOfWeekMap[dayString])
+        .where((dayInt) => dayInt != null) // Filtra dias inválidos
         .toSet();
     return enabledWeekdays.contains(day.weekday);
   }
@@ -62,6 +64,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<void> _generateAvailableTimeSlots(DateTime day) async {
+    // (O resto desta função permanece inalterado)
     setState(() {
       _isLoadingTimes = true;
       _availableTimeSlots = [];
@@ -108,6 +111,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<void> _confirmBooking() async {
+    // (O resto desta função permanece inalterado)
     if (_selectedDay == null || _selectedTime == null) return;
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -116,9 +120,7 @@ class _BookingScreenState extends State<BookingScreen> {
       return;
     }
 
-    setState(() {
-      _isBooking = true;
-    });
+    setState(() => _isBooking = true);
 
     try {
       final bookingDateTime = DateTime(
@@ -156,11 +158,7 @@ class _BookingScreenState extends State<BookingScreen> {
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isBooking = false;
-        });
-      }
+      if (mounted) setState(() => _isBooking = false);
     }
   }
 
@@ -180,88 +178,102 @@ class _BookingScreenState extends State<BookingScreen> {
               icon: _isBooking ? null : const Icon(Icons.check),
             )
           : null,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Selecione uma data",
-                style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 16),
-            Card(
-              clipBehavior: Clip.antiAlias,
-              child: TableCalendar(
-                locale: 'pt_BR',
-                firstDay: DateTime.now(),
-                lastDay: DateTime.now().add(const Duration(days: 90)),
-                focusedDay: _focusedDay,
-                calendarFormat: _calendarFormat,
-                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                enabledDayPredicate: _isDayEnabled,
-                onDaySelected: (selectedDay, focusedDay) {
-                  if (!_isDayEnabled(selectedDay)) return;
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                  _generateAvailableTimeSlots(selectedDay);
-                },
-                onFormatChanged: (format) {
-                  if (_calendarFormat != format) {
-                    setState(() {
-                      _calendarFormat = format;
-                    });
-                  }
-                },
-                calendarStyle: CalendarStyle(
-                    disabledTextStyle: TextStyle(color: Colors.grey[600]),
-                    todayDecoration: BoxDecoration(
-                        color: Colors.purple.withOpacity(0.5),
-                        shape: BoxShape.circle),
-                    selectedDecoration: const BoxDecoration(
-                        color: Colors.purple, shape: BoxShape.circle)),
+      // --- CORREÇÃO APLICADA AQUI ---
+      // 1. Verificamos se o artista configurou seus dias de trabalho.
+      body: widget.artist.workingDays.isEmpty
+          // 2. Se a lista de dias estiver vazia, mostramos uma mensagem informativa.
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Text(
+                  "Este artista ainda não configurou a sua agenda de trabalho. Não é possível agendar no momento.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ),
+            )
+          // 3. Se houver dias de trabalho, construímos a tela normalmente.
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Selecione uma data",
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  const SizedBox(height: 16),
+                  Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: TableCalendar(
+                      locale: 'pt_BR',
+                      firstDay: DateTime.now(),
+                      lastDay: DateTime.now().add(const Duration(days: 90)),
+                      focusedDay: _focusedDay,
+                      calendarFormat: _calendarFormat,
+                      selectedDayPredicate: (day) =>
+                          isSameDay(_selectedDay, day),
+                      enabledDayPredicate:
+                          _isDayEnabled, // Esta função agora funciona como esperado.
+                      onDaySelected: (selectedDay, focusedDay) {
+                        if (!_isDayEnabled(selectedDay)) return;
+                        setState(() {
+                          _selectedDay = selectedDay;
+                          _focusedDay = focusedDay;
+                        });
+                        _generateAvailableTimeSlots(selectedDay);
+                      },
+                      onFormatChanged: (format) {
+                        if (_calendarFormat != format) {
+                          setState(() => _calendarFormat = format);
+                        }
+                      },
+                      calendarStyle: CalendarStyle(
+                          disabledTextStyle: TextStyle(color: Colors.grey[600]),
+                          todayDecoration: BoxDecoration(
+                              color: Colors.purple.withOpacity(0.5),
+                              shape: BoxShape.circle),
+                          selectedDecoration: const BoxDecoration(
+                              color: Colors.purple, shape: BoxShape.circle)),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  if (_selectedDay != null)
+                    Text(
+                        "Horários para ${DateFormat('dd/MM/yyyy', 'pt_BR').format(_selectedDay!)}:",
+                        style: Theme.of(context).textTheme.headlineSmall),
+                  const SizedBox(height: 16),
+                  if (_isLoadingTimes)
+                    const Center(child: CircularProgressIndicator())
+                  else if (!_isLoadingTimes &&
+                      _availableTimeSlots.isEmpty &&
+                      _selectedDay != null)
+                    const Center(
+                        child:
+                            Text("Nenhum horário disponível para esta data."))
+                  else
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: _availableTimeSlots.map((time) {
+                        final isSelected = _selectedTime == time;
+                        return ElevatedButton(
+                          onPressed: () => setState(() => _selectedTime = time),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  isSelected ? Colors.purple : Colors.grey[800],
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8))),
+                          child: Text(time.format(context),
+                              style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.white70)),
+                        );
+                      }).toList(),
+                    ),
+                  const SizedBox(height: 80),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            if (_selectedDay != null)
-              Text(
-                  "Horários para ${DateFormat('dd/MM/yyyy', 'pt_BR').format(_selectedDay!)}:",
-                  style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 16),
-            if (_isLoadingTimes)
-              const Center(child: CircularProgressIndicator())
-            else if (!_isLoadingTimes &&
-                _availableTimeSlots.isEmpty &&
-                _selectedDay != null)
-              const Center(
-                  child: Text("Nenhum horário disponível para esta data."))
-            else
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: _availableTimeSlots.map((time) {
-                  final isSelected = _selectedTime == time;
-                  return ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedTime = time;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            isSelected ? Colors.purple : Colors.grey[800],
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8))),
-                    child: Text(time.format(context),
-                        style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.white70)),
-                  );
-                }).toList(),
-              ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
     );
   }
 }

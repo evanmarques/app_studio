@@ -20,14 +20,21 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
     _artistsFuture = _fetchArtists();
   }
 
+  // Esta função busca os dados dos artistas no Firestore.
   Future<List<Artist>> _fetchArtists() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('studios')
         .orderBy('name')
         .get();
 
+    // Mapeia cada documento do Firestore para um objeto Artist.
     return snapshot.docs.map((doc) {
       final data = doc.data();
+
+      //--- CORREÇÃO APLICADA AQUI ---
+      // Agora estamos lendo os campos 'workingDays', e 'endTime'
+      // do Firebase e passando-os para o nosso modelo Artist.
+      // Sem isso, a tela de agendamentos nunca saberia quais dias habilitar
       return Artist(
         uid: doc.id,
         studioName: data['name'] ?? '',
@@ -40,6 +47,11 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
         whatsappNumber: data['whatsappNumber'],
         facebookUrl: data['facebookUrl'],
         portfolioImageUrls: List<String>.from(data['portfolioImageUrls'] ?? []),
+
+        // CAMPOS ADICIONAOS PARA LER A DISPONIBILIDADE DO TATUADOR
+        workingDays: List<String>.from(data['workingDays'] ?? []),
+        startTime: data['startTime'],
+        endTime: data['endTime'],
       );
     }).toList();
   }
