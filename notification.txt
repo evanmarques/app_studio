@@ -1,0 +1,172 @@
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+I/flutter (29785): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(61)] Using the Impeller rendering backend (Vulkan).
+Connecting to VM Service at ws://127.0.0.1:57772/NQw0tl8BIo4=/ws
+Connected to the VM Service.
+I/flutter (29785): ====================================
+I/flutter (29785): FCM Token: cg7wF5saS6a5dI2eeE45HX:APA91bFoZNB3nDsy7CIb7fff73jFXi1eA6CQU8pqTLnLKsttkh0EOHsezgmcbXcbIXEQWIYj8ts26pO5-ol3LAMbWF0DVQzeDsjpaMrdUS3sFavZtVRPQBk
+I/flutter (29785): ====================================
+W/DynamiteModule(29785): Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found.
+D/ConnectivityManager(29785): StackLog: [android.net.ConnectivityManager.sendRequestForNetwork(ConnectivityManager.java:4671)] [android.net.ConnectivityManager.registerDefaultNetworkCallbackForUid(ConnectivityManager.java:5360)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5327)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5301)] [com.google.firebase.firestore.remote.AndroidConnectivityMonitor.configureNetworkMonitoring(AndroidConnectivityMonitor.java:87)] [com.google.firebase.firestore.remote.AndroidConnectivityMonitor.<init>(AndroidConnectivityMonitor.java:64)] [com.google.firebase.firestore.core.MemoryComponentProvider.createConnectivityMonitor(MemoryComponentProvider.java:68)] [com.google.firebase.firestore.core.MemoryComponentProvider.createConnectivityMonitor(MemoryComponentProvider.java:42)] [com.google.firebase.firestore.core.ComponentProvider.initialize(ComponentProvider.java:152)] [com.google.firebase.firestore.core.FirestoreClient.initialize(FirestoreClient.java:296)] [com.google.firebase.firestore.core.FirestoreClient.lambda$new$0$com-google-firebase-firestore-core-FirestoreClient(FirestoreClient.java:114)] [com.google.firebase.firestore.core.FirestoreClient$$ExternalSyntheticLambda6.run(D8$$SyntheticClass:0)] [com.google.firebase.firestore.util.AsyncQueue.lambda$enqueue$2(AsyncQueue.java:444)] [com.google.firebase.firestore.util.AsyncQueue$$ExternalSyntheticLambda4.call(D8$$SyntheticClass:0)] [com.google.firebase.firestore.util.AsyncQueue$SynchronizedShutdownAwareExecutor.lambda$executeAndReportResult$1(AsyncQueue.java:330)] [com.google.firebase.firestore.util.AsyncQueue$SynchronizedShutdownAwareExecutor$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)] [java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)] [java.util.concurrent.FutureTask.run(FutureTask.java:264)] [java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:307)] [java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)] [java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)] [com.google.firebase.firestore.util.AsyncQueue$SynchronizedShutdownAwareExecutor$DelayedStartFactory.run(AsyncQueue.java:235)] [java.lang.Thread.run(Thread.java:1012)]
+I/DynamiteModule(29785): Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0
+W/ProviderInstaller(29785): Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0.
+D/ApplicationLoaders(29785): Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+D/nativeloader(29785): Configuring clns-8 for other apk /system/framework/com.android.media.remotedisplay.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/lib/arm64:/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(29785): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libhigh_res.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:liblow_light_hdr.arcsoft.so:libhigh_dynamic_range.arcsoft.so:libsuperresolution_raw.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libC2paDps.camera.samsung.so:libVideoClassifier.camera.samsung.so:libImageScreener.camera.samsung.so:libMyFilter.camera.samsung.so:libtflite2.myfilters.camera.samsung.so:libHIDTSnapJNI.camera.samsung.so:libSmartSca
+W/mple.app_studio(29785): Loading /data/misc/apexdata/com.android.art/dalvik-cache/arm64/system@framework@com.android.location.provider.jar@classes.odex non-executable as it requires an image which we failed to load
+D/nativeloader(29785): Configuring clns-9 for other apk /system/framework/com.android.location.provider.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/lib/arm64:/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(29785): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libhigh_res.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:liblow_light_hdr.arcsoft.so:libhigh_dynamic_range.arcsoft.so:libsuperresolution_raw.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libC2paDps.camera.samsung.so:libVideoClassifier.camera.samsung.so:libImageScreener.camera.samsung.so:libMyFilter.camera.samsung.so:libtflite2.myfilters.camera.samsung.so:libHIDTSnapJNI.camera.samsung.so:libSmartSca
+D/nativeloader(29785): Configuring clns-10 for other apk /system/system_ext/framework/org.carconnectivity.android.digitalkey.rangingintent.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/lib/arm64:/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(29785): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libhigh_res.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:liblow_light_hdr.arcsoft.so:libhigh_dynamic_range.arcsoft.so:libsuperresolution_raw.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libC2paDps.camera.samsung.so:libVideoClassifier.camera.samsung.so:libImageScreener.camera.samsung.so:libMyFilter.camera.samsung.so:libtflite2.myfilters.camera.samsung.so:libHIDTSnapJNI.camera.samsung.so:libSmartSca
+D/nativeloader(29785): Configuring clns-11 for other apk /system/system_ext/framework/org.carconnectivity.android.digitalkey.secureelement.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/lib/arm64:/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(29785): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libhigh_res.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:liblow_light_hdr.arcsoft.so:libhigh_dynamic_range.arcsoft.so:libsuperresolution_raw.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libC2paDps.camera.samsung.so:libVideoClassifier.camera.samsung.so:libImageScreener.camera.samsung.so:libMyFilter.camera.samsung.so:libtflite2.myfilters.camera.samsung.so:libHIDTSnapJNI.camera.samsung.so:libSmartSca
+D/ApplicationLoaders(29785): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+D/ApplicationLoaders(29785): Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+D/nativeloader(29785): Configuring clns-12 for other apk /data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/lib/arm64:/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+W/ProviderInstaller(29785): Failed to report request stats: com.google.android.gms.common.security.ProviderInstallerImpl.reportRequestStats [class android.content.Context, long, long]
+W/mple.app_studio(29785): Accessing hidden method Ldalvik/system/VMStack;->getStackClass2()Ljava/lang/Class; (unsupported, reflection, allowed)
+E/GoogleApiManager(29785): Failed to get service from broker. 
+E/GoogleApiManager(29785): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(29785): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3257)
+E/GoogleApiManager(29785): 	at android.os.Parcel.createException(Parcel.java:3241)
+E/GoogleApiManager(29785): 	at android.os.Parcel.readException(Parcel.java:3224)
+E/GoogleApiManager(29785): 	at android.os.Parcel.readException(Parcel.java:3166)
+E/GoogleApiManager(29785): 	at aygi.a(:com.google.android.gms@252431035@25.24.31 (260400-772615181):36)
+E/GoogleApiManager(29785): 	at ayep.z(:com.google.android.gms@252431035@25.24.31 (260400-772615181):143)
+E/GoogleApiManager(29785): 	at axlr.run(:com.google.android.gms@252431035@25.24.31 (260400-772615181):42)
+E/GoogleApiManager(29785): 	at android.os.Handler.handleCallback(Handler.java:959)
+E/GoogleApiManager(29785): 	at android.os.Handler.dispatchMessage(Handler.java:100)
+E/GoogleApiManager(29785): 	at chst.ms(:com.google.android.gms@252431035@25.24.31 (260400-772615181):1)
+E/GoogleApiManager(29785): 	at chst.dispatchMessage(:com.google.android.gms@252431035@25.24.31 (260400-772615181):5)
+E/GoogleApiManager(29785): 	at android.os.Looper.loopOnce(Looper.java:257)
+E/GoogleApiManager(29785): 	at android.os.Looper.loop(Looper.java:342)
+E/GoogleApiManager(29785): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/FlagRegistrar(29785): Failed to register com.google.android.gms.providerinstaller#com.example.app_studio
+W/FlagRegistrar(29785): fifi: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null}
+W/FlagRegistrar(29785): 	at fifk.a(:com.google.android.gms@252431035@25.24.31 (260400-772615181):13)
+W/FlagRegistrar(29785): 	at gdwp.d(:com.google.android.gms@252431035@25.24.31 (260400-772615181):3)
+W/FlagRegistrar(29785): 	at gdwr.run(:com.google.android.gms@252431035@25.24.31 (260400-772615181):130)
+W/FlagRegistrar(29785): 	at gdyz.execute(:com.google.android.gms@252431035@25.24.31 (260400-772615181):1)
+W/FlagRegistrar(29785): 	at gdxa.f(:com.google.android.gms@252431035@25.24.31 (260400-772615181):1)
+W/FlagRegistrar(29785): 	at gdxa.m(:com.google.android.gms@252431035@25.24.31 (260400-772615181):99)
+W/FlagRegistrar(29785): 	at gdxa.r(:com.google.android.gms@252431035@25.24.31 (260400-772615181):17)
+W/FlagRegistrar(29785): 	at faos.hI(:com.google.android.gms@252431035@25.24.31 (260400-772615181):35)
+W/FlagRegistrar(29785): 	at eotn.run(:com.google.android.gms@252431035@25.24.31 (260400-772615181):12)
+W/FlagRegistrar(29785): 	at gdyz.execute(:com.google.android.gms@252431035@25.24.31 (260400-772615181):1)
+W/FlagRegistrar(29785): 	at eoto.b(:com.google.android.gms@252431035@25.24.31 (260400-772615181):18)
+W/FlagRegistrar(29785): 	at eoud.b(:com.google.android.gms@252431035@25.24.31 (260400-772615181):36)
+W/FlagRegistrar(29785): 	at eouf.d(:com.google.android.gms@252431035@25.24.31 (260400-772615181):25)
+W/FlagRegistrar(29785): 	at axiz.c(:com.google.android.gms@252431035@25.24.31 (260400-772615181):9)
+W/FlagRegistrar(29785): 	at axlp.q(:com.google.android.gms@252431035@25.24.31 (260400-772615181):48)
+W/FlagRegistrar(29785): 	at axlp.d(:com.google.android.gms@252431035@25.24.31 (260400-772615181):10)
+W/FlagRegistrar(29785): 	at axlp.g(:com.google.android.gms@252431035@25.24.31 (260400-772615181):185)
+W/FlagRegistrar(29785): 	at axlp.onConnectionFailed(:com.google.android.gms@252431035@25.24.31 (260400-772615181):2)
+W/FlagRegistrar(29785): 	at axlr.run(:com.google.android.gms@252431035@25.24.31 (260400-772615181):70)
+W/FlagRegistrar(29785): 	at android.os.Handler.handleCallback(Handler.java:959)
+W/FlagRegistrar(29785): 	at android.os.Handler.dispatchMessage(Handler.java:100)
+W/FlagRegistrar(29785): 	at chst.ms(:com.google.android.gms@252431035@25.24.31 (260400-772615181):1)
+W/FlagRegistrar(29785): 	at chst.dispatchMessage(:com.google.android.gms@252431035@25.24.31 (260400-772615181):5)
+W/FlagRegistrar(29785): 	at android.os.Looper.loopOnce(Looper.java:257)
+W/FlagRegistrar(29785): 	at android.os.Looper.loop(Looper.java:342)
+W/FlagRegistrar(29785): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/FlagRegistrar(29785): Caused by: axhn: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null}
+W/FlagRegistrar(29785): 	at ayeb.a(:com.google.android.gms@252431035@25.24.31 (260400-772615181):15)
+W/FlagRegistrar(29785): 	at axjc.a(:com.google.android.gms@252431035@25.24.31 (260400-772615181):1)
+W/FlagRegistrar(29785): 	at axiz.c(:com.google.android.gms@252431035@25.24.31 (260400-772615181):5)
+W/FlagRegistrar(29785): 	... 12 more
+D/nativeloader(29785): Load /data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk!/lib/arm64-v8a/libconscrypt_gmscore_jni.so using ns clns-12 from class loader (caller=/data/app/~~IFKxsLAUj409-zOvLiRuZA==/com.google.android.gms-xPk5L4KqvoL6DE82opQoFg==/base.apk): ok
+V/NativeCrypto(29785): Registering com/google/android/gms/org/conscrypt/NativeCrypto's 315 native methods...
+W/mple.app_studio(29785): Accessing hidden method Ljava/security/spec/ECParameterSpec;->getCurveName()Ljava/lang/String; (unsupported, reflection, allowed)
+I/ProviderInstaller(29785): Installed default security provider GmsCore_OpenSSL
+D/ConnectivityManager(29785): StackLog: [android.net.ConnectivityManager.sendRequestForNetwork(ConnectivityManager.java:4671)] [android.net.ConnectivityManager.registerDefaultNetworkCallbackForUid(ConnectivityManager.java:5360)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5327)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5301)] [io.grpc.android.AndroidChannelBuilder$AndroidChannel.configureNetworkMonitoring(AndroidChannelBuilder.java:216)] [io.grpc.android.AndroidChannelBuilder$AndroidChannel.<init>(AndroidChannelBuilder.java:197)] [io.grpc.android.AndroidChannelBuilder.build(AndroidChannelBuilder.java:168)] [com.google.firebase.firestore.remote.GrpcCallProvider.initChannel(GrpcCallProvider.java:116)] [com.google.firebase.firestore.remote.GrpcCallProvider.lambda$initChannelTask$6$com-google-firebase-firestore-remote-GrpcCallProvider(GrpcCallProvider.java:242)] [com.google.firebase.firestore.remote.GrpcCallProvider$$ExternalSyntheticLambda4.call(D8$$SyntheticClass:0)] [com.google.android.gms.tasks.zzz.run(com.google.android.gms:play-services-tasks@@18.1.0:1)] [com.google.firebase.firestore.util.ThrottledForwardingExecutor.lambda$execute$0$com-google-firebase-firestore-util-ThrottledForwardingExecutor(ThrottledForwardingExecutor.java:54)] [com.google.firebase.firestore.util.ThrottledForwardingExecutor$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)] [java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)] [java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)] [java.lang.Thread.run(Thread.java:1012)]
+W/mple.app_studio(29785): Accessing hidden field Ljava/net/Socket;->impl:Ljava/net/SocketImpl; (unsupported, reflection, allowed)
+W/mple.app_studio(29785): Accessing hidden method Ljava/security/spec/ECParameterSpec;->setCurveName(Ljava/lang/String;)V (unsupported, reflection, allowed)
+I/Choreographer(29785): Skipped 45 frames!  The application may be doing too much work on its main thread.
+I/BLASTBufferQueue(29785): [SurfaceView[com.example.app_studio/com.example.app_studio.MainActivity]@0#1](f:0,a:0,s:0) onFrameAvailable the first frame is available
+D/SurfaceView(29785): 91210563 setAlpha: alpha=1.0
+I/SurfaceView(29785): 91210563 Changes: creating=false format=false size=false visible=false alpha=true hint=false visible=false left=false top=false z=false attached=true lifecycleStrategy=false
+I/SurfaceView(29785): 91210563 Cur surface: Surface(name=null mNativeObject=-5476376629264751216)/@0x10558b
+I/SurfaceView@56fc343(29785): updateSurface: mVisible = true mSurface.isValid() = true
+I/SurfaceView@56fc343(29785): updateSurface: mSurfaceCreated = true surfaceChanged = false visibleChanged = false
+I/SurfaceView(29785): 91210563 surfaceRedrawNeeded
+I/SurfaceView(29785): 91210563 finishedDrawing
+V/SurfaceView(29785): Layout: x=0 y=0 w=1080 h=2340, frame=Rect(0, 0 - 1080, 2340)
+D/VRI[MainActivity]@3448e25(29785): Setup new sync=wmsSync-VRI[MainActivity]@3448e25#2
+I/VRI[MainActivity]@3448e25(29785): Creating new active sync group VRI[MainActivity]@3448e25#3
+D/VRI[MainActivity]@3448e25(29785): Draw frame after cancel
+D/VRI[MainActivity]@3448e25(29785): registerCallbacksForSync syncBuffer=false
+D/SurfaceView(29785): 91210563 updateSurfacePosition RenderWorker, frameNr = 1, position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+I/SurfaceView@56fc343(29785): uSP: rtp = Rect(0, 0 - 1080, 2340) rtsw = 1080 rtsh = 2340
+I/SurfaceView@56fc343(29785): onSSPAndSRT: pl = 0 pt = 0 sx = 1.0 sy = 1.0
+I/SurfaceView@56fc343(29785): aOrMT: VRI[MainActivity]@3448e25 t = android.view.SurfaceControl$Transaction@7883c59 fN = 1 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1792 android.graphics.RenderNode$CompositePositionUpdateListener.positionChanged:398 
+I/VRI[MainActivity]@3448e25(29785): mWNT: t=0xb4000078d463e9d0 mBlastBufferQueue=0xb4000078046223b0 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.SurfaceView.applyOrMergeTransaction:1723 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1792 
+D/VRI[MainActivity]@3448e25(29785): Received frameDrawingCallback syncResult=0 frameNum=1.
+I/VRI[MainActivity]@3448e25(29785): mWNT: t=0xb4000078d4649fd0 mBlastBufferQueue=0xb4000078046223b0 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl$11.onFrameDraw:15016 android.view.ThreadedRenderer$1.onFrameDraw:761 <bottom of call stack> 
+I/VRI[MainActivity]@3448e25(29785): Setting up sync and frameCommitCallback
+I/BLASTBufferQueue(29785): [VRI[MainActivity]@3448e25#0](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/VRI[MainActivity]@3448e25(29785): Received frameCommittedCallback lastAttemptedDrawFrameNum=1 didProduceBuffer=true
+D/HWUI    (29785): CFMS:: SetUp Pid : 29785    Tid : 29852
+D/VRI[MainActivity]@3448e25(29785): reportDrawFinished seqId=0
+D/VRI[MainActivity]@3448e25(29785): mThreadedRenderer.initializeIfNeeded()#2 mSurface={isValid=true 0xb4000078846d9820}
+D/InputMethodManagerUtils(29785): startInputInner - Id : 0
+I/InputMethodManager(29785): startInputInner - IInputMethodManagerGlobalInvoker.startInputOrWindowGainedFocus
+D/InputTransport(29785): Input channel constructed: 'ClientS', fd=207
+I/InsetsController(29785): onStateChanged: host=com.example.app_studio/com.example.app_studio.MainActivity, from=android.view.ViewRootImpl.handleInsetsControlChanged:2888, state=InsetsState: {mDisplayFrame=Rect(0, 0 - 1080, 2340), mDisplayCutout=DisplayCutout{insets=Rect(0, 80 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(511, 0 - 569, 80), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=1080 displayHeight=2340 physicalDisplayWidth=1080 physicalDisplayHeight=2340 density={2.8125} cutoutSpec={M 0,0 M 0,7.822222222222222‬‬ a 10.31111111111111‬,10.31111111111111‬ 0 1,0 0,20.62222222222222‬ a 10.31111111111111‬,10.31111111111111‬ 0 1,0 0,-20.62222222222222‬ Z @dp} rotation={0} scale={1.0} physicalPixelDisplaySizeRatio={1.0}}} sideOverrides={}}, mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=113, center=Point(113, 113)}, RoundedCorner{position=TopRight, radius=113, center=Point(967, 113)}, RoundedCorner{position=BottomRight, radius=113, center=Point(967, 2227)}, RoundedCorner{position=BottomLeft, radius=113, center=Point(113, 2227)}]}  mRoundedCornerFrame=Rect(0, 0 - 1080, 2340), mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(956, 0 - 1080, 80) rotation=0}, mDisplayShape=DisplayShape{ spec=-311912193 displayWidth=1080 displayHeight=2340 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}, mSources= { InsetsSource: {b5cc0001 mType=navigationBars mFrame=[0,2298][1080,2340] mVisible=true mFlags=SUPPRESS_SCRIM mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {b5cc0004 mType=systemGestures mFrame=[0,0][84,2340] mVisible=true mFlags= mSideHint=LEFT mBoundingRects=null}, InsetsSource: {b5cc0005 mType=mandatorySystemGestures mFrame=[0,2250][1080,2340] mVisible=true mFlags= mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {b5cc0006 mType=tappableElement mFrame=[0,0][0,0] mVisible=true mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {b5cc0024 mType=systemGestures mFrame=[996,0][1080,2340] mVisible=true mFlags= mSideHint=RIGHT mBoundingRects=null}, InsetsSource: {3 mType=ime mFrame=[0,0][0,0] mVisible=false mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {27 mType=displayCutout mFrame=[0,0][1080,80] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {33f90000 mType=statusBars mFrame=[0,0][1080,80] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {33f90005 mType=mandatorySystemGestures mFrame=[0,0][1080,114] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {33f90006 mType=tappableElement mFrame=[0,0][1080,80] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null} }
+I/InsetsSourceConsumer(29785): applyRequestedVisibilityToControl: visible=false, type=ime, host=com.example.app_studio/com.example.app_studio.MainActivity
+E/FlutterJNI(29785): Failed to decode image
+E/FlutterJNI(29785): android.graphics.ImageDecoder$DecodeException: Failed to create image decoder with message 'unimplemented'Input contained an error.
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.nCreate(Native Method)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.-$$Nest$smnCreate(Unknown Source:0)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder$ByteBufferSource.createImageDecoder(ImageDecoder.java:254)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.decodeBitmapImpl(ImageDecoder.java:1856)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.decodeBitmap(ImageDecoder.java:1848)
+E/FlutterJNI(29785): 	at io.flutter.embedding.engine.FlutterJNI.decodeImage(FlutterJNI.java:571)
+E/FlutterJNI(29785): Failed to decode image
+E/FlutterJNI(29785): android.graphics.ImageDecoder$DecodeException: Failed to create image decoder with message 'unimplemented'Input contained an error.
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.nCreate(Native Method)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.-$$Nest$smnCreate(Unknown Source:0)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder$ByteBufferSource.createImageDecoder(ImageDecoder.java:254)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.decodeBitmapImpl(ImageDecoder.java:1856)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.decodeBitmap(ImageDecoder.java:1848)
+E/FlutterJNI(29785): 	at io.flutter.embedding.engine.FlutterJNI.decodeImage(FlutterJNI.java:571)
+E/FlutterJNI(29785): Failed to decode image
+E/FlutterJNI(29785): android.graphics.ImageDecoder$DecodeException: Failed to create image decoder with message 'unimplemented'Input contained an error.
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.nCreate(Native Method)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.-$$Nest$smnCreate(Unknown Source:0)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder$ByteBufferSource.createImageDecoder(ImageDecoder.java:254)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.decodeBitmapImpl(ImageDecoder.java:1856)
+E/FlutterJNI(29785): 	at android.graphics.ImageDecoder.decodeBitmap(ImageDecoder.java:1848)
+E/FlutterJNI(29785): 	at io.flutter.embedding.engine.FlutterJNI.decodeImage(FlutterJNI.java:571)
+D/ProfileInstaller(29785): Installing profile for com.example.app_studio
+V/MediaMetadataRetriever(29785): constructor
+V/MediaMetadataRetriever(29785): setDataSource(IDataSource)
+V/MediaMetadataRetriever(29785): setDataSource(IDataSource) return(0)
+V/MediaMetadataRetriever(29785): extractMetadata(26)
+V/MediaMetadataRetriever(29785): extractMetadata(17)
+V/MediaMetadataRetriever(29785): getImageAtIndex: index(-1) colorFormat(4) metaOnly(1) thumbnail(0)
+V/MediaMetadataRetriever(29785): getImageAtIndex: index(-1) colorFormat(1) metaOnly(0) thumbnail(0)
+V/MediaMetadataRetriever(29785): destructor
+V/MediaMetadataRetriever(29785): disconnect
+I/VRI[MainActivity]@3448e25(29785): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@3448e25
+W/WindowOnBackDispatcher(29785): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(29785): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+E/GoogleApiManager(29785): Failed to get service from broker. 
+E/GoogleApiManager(29785): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(29785): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3257)
+E/GoogleApiManager(29785): 	at android.os.Parcel.createException(Parcel.java:3241)
+E/GoogleApiManager(29785): 	at android.os.Parcel.readException(Parcel.java:3224)
+E/GoogleApiManager(29785): 	at android.os.Parcel.readException(Parcel.java:3166)
+E/GoogleApiManager(29785): 	at aygi.a(:com.google.android.gms@252431035@25.24.31 (260400-772615181):36)
+E/GoogleApiManager(29785): 	at ayep.z(:com.google.android.gms@252431035@25.24.31 (260400-772615181):143)
+E/GoogleApiManager(29785): 	at axlr.run(:com.google.android.gms@252431035@25.24.31 (260400-772615181):42)
+E/GoogleApiManager(29785): 	at android.os.Handler.handleCallback(Handler.java:959)
+E/GoogleApiManager(29785): 	at android.os.Handler.dispatchMessage(Handler.java:100)
+E/GoogleApiManager(29785): 	at chst.ms(:com.google.android.gms@252431035@25.24.31 (260400-772615181):1)
+E/GoogleApiManager(29785): 	at chst.dispatchMessage(:com.google.android.gms@252431035@25.24.31 (260400-772615181):5)
+E/GoogleApiManager(29785): 	at android.os.Looper.loopOnce(Looper.java:257)
+E/GoogleApiManager(29785): 	at android.os.Looper.loop(Looper.java:342)
+E/GoogleApiManager(29785): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+I/VRI[MainActivity]@3448e25(29785): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@3448e25
+I/VRI[MainActivity]@3448e25(29785): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@3448e25
+W/WindowOnBackDispatcher(29785): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(29785): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+I/VRI[MainActivity]@3448e25(29785): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@3448e25

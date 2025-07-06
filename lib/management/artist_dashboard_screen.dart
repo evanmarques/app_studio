@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pc_studio_app/management/portfolio_manager_screen.dart';
-import 'package:pc_studio_app/models/appointment.dart'; // Importa o modelo de agendamento
-import 'package:intl/intl.dart'; // Importa para formatação de data
+import 'package:pc_studio_app/models/appointment.dart';
+import 'package:intl/intl.dart';
 
 class ArtistDashboardScreen extends StatefulWidget {
   const ArtistDashboardScreen({super.key});
@@ -15,6 +15,7 @@ class ArtistDashboardScreen extends StatefulWidget {
 }
 
 class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
+  // --- O SEU CÓDIGO EXISTENTE PARA GERIR DISPONIBILIDADE FOI MANTIDO ---
   final _startTimeController = TextEditingController();
   final _endTimeController = TextEditingController();
 
@@ -82,20 +83,16 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
   Future<void> _saveAvailability() async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) return;
-
     setState(() => _isLoading = true);
-
     final selectedDays = _workingDays.entries
         .where((entry) => entry.value)
         .map((entry) => entry.key)
         .toList();
-
     final availabilityData = {
       'workingDays': selectedDays,
       'startTime': _startTimeController.text.trim(),
       'endTime': _endTimeController.text.trim(),
     };
-
     try {
       await _db.collection("studios").doc(userId).update(availabilityData);
       if (mounted) {
@@ -111,9 +108,9 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+  // --- FIM DO SEU CÓDIGO EXISTENTE ---
 
-  // --- NOVA FUNÇÃO ---
-  // Atualiza o status de um agendamento no Firestore.
+  /// Função para atualizar o status de um agendamento (confirmar ou cancelar).
   Future<void> _updateAppointmentStatus(
       String appointmentId, String newStatus) async {
     try {
@@ -121,15 +118,19 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
           .collection('appointments')
           .doc(appointmentId)
           .update({'status': newStatus});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Agendamento ${newStatus == 'confirmed' ? 'confirmado' : 'recusado'}!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Agendamento ${newStatus == 'confirmed' ? 'confirmado' : 'recusado'}!')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar agendamento: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar agendamento: $e')),
+        );
+      }
     }
   }
 
@@ -140,24 +141,25 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
         title: const Text("Painel do Artista"),
         backgroundColor: Colors.transparent,
       ),
+      // O corpo principal agora é um ListView para permitir a rolagem de todas as seções.
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              // Usamos ListView para permitir rolagem de todo o conteúdo
               padding: const EdgeInsets.all(16.0),
               children: [
-                // --- NOVA SEÇÃO: SOLICITAÇÕES PENDENTES ---
+                // --- SEÇÃO DE SOLICITAÇÕES PENDENTES ---
                 const Text(
                   "Solicitações Pendentes",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                _buildPendingAppointmentsList(), // Widget que constrói a lista
+                // Este widget irá construir a lista de agendamentos pendentes.
+                _buildPendingAppointmentsList(),
                 const SizedBox(height: 32),
 
-                // --- SEÇÃO EXISTENTE: GERIR DISPONIBILIDADE ---
+                // --- SUA SEÇÃO EXISTENTE PARA GERIR DISPONIBILIDADE ---
                 const Text(
-                  "Gerir Disponibilidade",
+                  "Gerir Disponibilidade e Perfil",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -178,6 +180,7 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
                 ),
                 const SizedBox(height: 16),
                 const Text("Dias de Trabalho:", style: TextStyle(fontSize: 16)),
+                // O seu código para os Checkboxes dos dias da semana.
                 ..._workingDays.keys.map((day) {
                   return CheckboxListTile(
                     title: Text(_dayTranslations[day]!),
@@ -188,6 +191,7 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
                   );
                 }),
                 const SizedBox(height: 16),
+                // Os seus campos de texto para os horários.
                 TextField(
                   controller: _startTimeController,
                   decoration: const InputDecoration(
@@ -202,6 +206,7 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
                       border: OutlineInputBorder()),
                 ),
                 const SizedBox(height: 24),
+                // O seu botão para salvar a disponibilidade.
                 ElevatedButton(
                   onPressed: _saveAvailability,
                   style: ElevatedButton.styleFrom(
@@ -216,13 +221,14 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
     );
   }
 
-  // --- NOVO WIDGET ---
-  // Constrói a lista de agendamentos com status 'pending'.
+  // --- WIDGET ATUALIZADO ---
+  // Usa um StreamBuilder para buscar e exibir os agendamentos pendentes.
   Widget _buildPendingAppointmentsList() {
     final userId = _auth.currentUser?.uid;
     if (userId == null) return const SizedBox.shrink();
 
     return StreamBuilder<QuerySnapshot>(
+      // Esta consulta irá agora funcionar corretamente com o novo índice.
       stream: _db
           .collection('appointments')
           .where('artistId', isEqualTo: userId)
@@ -230,6 +236,10 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
           .orderBy('dateTime')
           .snapshots(),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+              child: Text("Erro ao buscar solicitações: ${snapshot.error}"));
+        }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -242,20 +252,21 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
 
         final appointments = snapshot.data!.docs;
 
+        // Usamos um ListView.builder para criar os itens da lista.
         return ListView.builder(
-          shrinkWrap: true, // Para o ListView caber dentro do outro ListView
-          physics:
-              const NeverScrollableScrollPhysics(), // Desabilita a rolagem interna
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: appointments.length,
           itemBuilder: (context, index) {
             final appointment = Appointment.fromFirestore(appointments[index]);
-            final formattedDate = DateFormat('dd/MM/yyyy \'às\' HH:mm')
+            final formattedDate = DateFormat('dd/MM/yyyy \'às\' HH:mm', 'pt_BR')
                 .format(appointment.dateTime);
 
             return Card(
               margin: const EdgeInsets.symmetric(vertical: 4),
               child: ListTile(
-                title: Text(appointment.clientName),
+                title: Text(appointment.clientName,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(formattedDate),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,

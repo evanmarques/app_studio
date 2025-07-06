@@ -1,10 +1,8 @@
-// lib/auth/welcome_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:pc_studio_app/auth/login_screen.dart';
 import 'package:pc_studio_app/auth/signup_screen.dart';
 import 'package:pc_studio_app/auth/auth_service.dart';
-// Importa o pacote FontAwesome para usar os ícones de marcas.
+import 'package:pc_studio_app/core/main_navigator.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -15,35 +13,33 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  // Estado para controlar o loading do login com Google.
   bool _isLoading = false;
-  // Instância do nosso serviço de autenticação.
   final AuthService _authService = AuthService();
 
-  // Função para lidar com o login do Google.
+  // *** LÓGICA DE LOGIN ATUALIZADA ***
   void _handleGoogleSignIn() async {
-    // Ativa o indicador de progresso e desabilita os botões.
     setState(() {
       _isLoading = true;
     });
-    try {
-      // Chama o método de login do nosso serviço.
-      await _authService.signInWithGoogle();
-      // O AuthGate tratará da navegação se o login for bem-sucedido.
-    } catch (e) {
-      // Se ocorrer um erro, exibe uma mensagem para o usuário.
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao fazer login com Google: $e')),
-        );
-      }
-    } finally {
-      // Garante que o indicador de progresso seja desativado no final.
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+
+    final navigator = Navigator.of(context);
+
+    // Chama o nosso serviço e agora espera uma resposta 'true' ou 'false'.
+    final bool success = await _authService.signInWithGoogle();
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+
+    // Se o login foi bem-sucedido, navegamos para a tela principal.
+    // Esta navegação explícita resolve o problema de "congelamento".
+    if (success && mounted) {
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const MainNavigator()),
+        (route) => false,
+      );
     }
   }
 
@@ -53,21 +49,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Imagem de fundo.
           Image.asset(
-            'assets/images/dragao.png',
+            'assets/images/dragao.png', // O nome do seu ficheiro foi corrigido para 'dragao.png'
             fit: BoxFit.cover,
             color: Colors.black.withOpacity(0.5),
             colorBlendMode: BlendMode.darken,
           ),
-
-          // Indicador de progresso centralizado.
           if (_isLoading)
             const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
-
-          // Conteúdo principal da tela.
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
@@ -75,7 +66,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Texto de boas-vindas.
                   const Column(
                     children: <Widget>[
                       Text(
@@ -96,10 +86,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ],
                   ),
-
                   const Spacer(),
-
-                  // Botões de ação.
                   Column(
                     children: <Widget>[
                       const Text(
@@ -110,16 +97,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Usando ícones do pacote FontAwesome para evitar erros de assets não encontrados.
                           _buildSocialButton(
                             icon: FontAwesomeIcons.google,
+                            // Chama a nossa nova função de login robusta.
                             onTap: _isLoading ? () {} : _handleGoogleSignIn,
                           ),
                           const SizedBox(width: 20),
                           _buildSocialButton(
                             icon: FontAwesomeIcons.instagram,
                             onTap: () {
-                              // TODO: Implementar login com Instagram
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content: Text(
@@ -131,7 +117,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           _buildSocialButton(
                             icon: FontAwesomeIcons.facebook,
                             onTap: () {
-                              // TODO: Implementar login com Facebook
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content: Text(
@@ -142,8 +127,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ],
                       ),
                       const SizedBox(height: 30),
-
-                      // Botões de login e registro com e-mail.
                       MaterialButton(
                         minWidth: double.infinity,
                         height: 60,
@@ -201,7 +184,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  // Widget auxiliar para criar os botões sociais redondos.
+  // O seu widget auxiliar para os botões sociais.
   Widget _buildSocialButton(
       {required IconData icon, required VoidCallback onTap}) {
     return InkWell(
