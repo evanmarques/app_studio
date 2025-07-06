@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pc_studio_app/core/main_navigator.dart'; // Importa a tela principal
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 // Converte o widget para StatefulWidget para que possamos gerenciar estados (texto, loading).
 class SignupScreen extends StatefulWidget {
@@ -64,11 +65,16 @@ class _SignupScreenState extends State<SignupScreen> {
       // 2. Salva os dados adicionais do usuário no Cloud Firestore.
       if (userCredential.user != null) {
         // Cria um mapa com os dados do usuário.
+        // 1. Pega o token FCM do dispositivo.
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
+        // 2. Adiciona o token ao mapa de dados do usuário.
         Map<String, dynamic> userMap = {
           "uid": userCredential.user!.uid,
           "fullName": _nameController.text.trim(),
           "email": _emailController.text.trim(),
           "role": "user",
+          "fcmToken": fcmToken, // <-- TOKEN SALVO NO CADASTRO
         };
 
         // Salva o documento na coleção "users" usando o UID do usuário como ID.

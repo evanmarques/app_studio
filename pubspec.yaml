@@ -37,6 +37,9 @@ dependencies:
   # Ícone padrão do Cupertino
   cupertino_icons: ^1.0.6
 
+  # Pacote para receber notificações push
+  firebase_messaging: ^14.9.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

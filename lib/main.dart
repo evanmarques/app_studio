@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pc_studio_app/auth/auth_gate.dart';
 import 'firebase_options.dart';
-
-// Importações para formatação de data/hora em português
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Importações para formatação de data/hora em português
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:pc_studio_app/core/notification_service.dart';
 
 // A função 'main' é o ponto de partida de todo aplicativo Flutter.
 Future<void> main() async {
@@ -22,6 +21,11 @@ Future<void> main() async {
   // 3. INICIALIZA A LOCALIZAÇÃO GLOBALMENTE (A CORREÇÃO DO ERRO!)
   // Carrega os dados de formatação para Português (Brasil) para TODO o app.
   await initializeDateFormatting('pt_BR', null);
+
+  // --- LINHA ADICIONADA ---
+  // Inicializa o nosso serviço de notificações assim que o app inicia.
+  // Isso pedirá permissão e obterá o token.
+  await NotificationService().initialize();
 
   // 4. Roda o aplicativo, agora com tudo preparado.
   runApp(const MyApp());
