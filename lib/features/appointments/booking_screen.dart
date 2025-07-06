@@ -111,7 +111,6 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<void> _confirmBooking() async {
-    // (O resto desta função permanece inalterado)
     if (_selectedDay == null || _selectedTime == null) return;
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -137,7 +136,8 @@ class _BookingScreenState extends State<BookingScreen> {
         'clientId': currentUser.uid,
         'clientName': currentUser.displayName ?? 'Utilizador sem nome',
         'dateTime': Timestamp.fromDate(bookingDateTime),
-        'status': 'confirmed',
+        'status':
+            'pending', //O status inicial agora é 'pending' para aguardar a confirmação do artista.
       };
 
       await FirebaseFirestore.instance
@@ -146,7 +146,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Agendamento confirmado com sucesso!')),
+          const SnackBar(content: Text('Solicitação de agendamento enviada!')),
         );
         Navigator.of(context).pop();
       }
@@ -178,7 +178,6 @@ class _BookingScreenState extends State<BookingScreen> {
               icon: _isBooking ? null : const Icon(Icons.check),
             )
           : null,
-      // --- CORREÇÃO APLICADA AQUI ---
       // 1. Verificamos se o artista configurou seus dias de trabalho.
       body: widget.artist.workingDays.isEmpty
           // 2. Se a lista de dias estiver vazia, mostramos uma mensagem informativa.

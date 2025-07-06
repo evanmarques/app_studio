@@ -1,5 +1,4 @@
-// lib/features/appointments/appointment_list_item.dart
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pc_studio_app/models/appointment.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +8,79 @@ class AppointmentListItem extends StatelessWidget {
   final Appointment appointment;
 
   const AppointmentListItem({super.key, required this.appointment});
+
+  //-- NOVA FUNÇÃO --
+  // Exibe o meni de opções (Modal Bottom Sheet) quando um item é tocado.
+  void _showOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Para o menu ter a altura mínima
+            children: [
+              Text(
+                'Opções para o Agendamento',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 20),
+              // -- LÓGICA ADICIONAL --
+              // Mostra o botão de cancelar apenas se o status for 'pending'.
+              if (appointment.status == 'pending')
+                ListTile(
+                  leading: const Icon(Icons.cancel, color: Colors.red),
+                  title: const Text('Cancelar Agendamento'),
+                  onTap: () {
+                    //Fecha o menu e chama a função para cancelar.
+                    Navigator.pop(context);
+                    _cancelAppointment(context);
+                  },
+                ),
+              if (appointment.status == 'pending')
+                ListTile(
+                  leading: const Icon(Icons.edit_calendar, color: Colors.blue),
+                  title: const Text('Alterar Data (Em breve)'),
+                  onTap: () {
+                    //Placeholder para a funcionalidade de alterar a data.
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text(
+                            'Funcionalidade de alterar data será implementada')));
+                  },
+                ),
+              //Se o agendamento já foi confirmado, mostra uma mensagem.
+              if (appointment.status == 'confirmed')
+                const ListTile(
+                  leading: Icon(Icons.check_circle, color: Colors.green),
+                  title: Text('Este agendamento está confirmado.'),
+                ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // -- NOVA FUNÇÃO --
+  // Atualiza o status do agendamento para 'cancelled' no Firestore.
+  Future<void> _cancelAppointment(BuildContext context) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('appointments')
+          .doc(appointment.id) // Usa o ID do documento para encontrá-lo
+          .update({'status': 'cancelled'}); // Atualiza apenas o campo 'status'
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Agendamento cancelado com sucesso!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('ERro ao cancelar agendamento: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
