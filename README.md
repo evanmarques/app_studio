@@ -133,3 +133,40 @@ O projeto utilizará um modelo de negócio "Freemium", gerando receita através 
 * **Funcionalidades Premium:**
     * [ ] Gestão de Estoque e Vendas de produtos.
     * [ ] Recurso de Teste de Tatuagem com Realidade Aumentada (AR).
+
+    --- Nova atualização:
+
+    ## 4. Roadmap do Projeto
+
+### Versão 1.0 (MVP Funcional) - CONCLUÍDO
+
+* **Fase 1: Fundação do Projeto**
+* **Fase 2: UI Base e Navegação**
+* **Fase 3: Autenticação de Utilizadores**
+* **Fase 4: Perfis e Gestão de Artista (v1)**
+* **Fase 5: Sistema de Agendamento (v1)**
+
+---
+
+### Versão 1.1 (Melhorias de Qualidade de Vida e UX) - EM ANDAMENTO
+
+* **Sistema de Agendamento Avançado (v2):**
+    * [ ] **Lado do Artista:** Permitir que o artista defina durações de sessão personalizadas com base no **tipo** e **tamanho** da tatuagem.
+    * [ ] **Lado do Cliente:** Criar um fluxo onde o cliente primeiro seleciona o tipo/tamanho da tatuagem antes de ver o calendário com os horários correspondentes.
+    * [ ] Permitir que o cliente selecione múltiplos horários consecutivos para sessões longas.
+* **Gestão de Agendamentos (Lado do Cliente):**
+    * [✓] Implementar funcionalidade para o cliente cancelar um agendamento.
+* **Notificações para o Artista:**
+    * [✓] Exibir um alerta visual na tela Home do artista sobre agendamentos pendentes.
+* **Melhorias na Gestão do Artista:**
+    * [ ] Tornar a gestão de disponibilidade mais interativa.
+
+### Versão 2.0 (Monetização e Funcionalidades Futuras) - A FAZER
+
+* **Implementação de Anúncios:**
+    * [ ] Integrar o Google AdMob para utilizadores e artistas "Free".
+* **Login Social Adicional:**
+    * [ ] Implementar o Login com Facebook.
+* **Melhorias na Experiência do Cliente:**
+    * [ ] Adicionar um popup na Home do cliente para lembretes de agendamentos.
+    * [ ] Tornar a tela de Perfil do utilizador mais rica.

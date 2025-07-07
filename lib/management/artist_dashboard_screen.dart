@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pc_studio_app/management/portfolio_manager_screen.dart';
+import 'package:pc_studio_app/management/service_management_screen.dart';
 import 'package:pc_studio_app/models/appointment.dart';
 import 'package:pc_studio_app/models/plan.dart';
 import 'package:intl/intl.dart';
@@ -16,13 +17,11 @@ class ArtistDashboardScreen extends StatefulWidget {
 }
 
 class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
-  // --- CONTROLADORES E ESTADO PARA TODAS AS FUNCIONALIDADES ---
+  // --- DEFINIÇÃO COMPLETA DAS VARIÁVEIS DE ESTADO ---
   final _startTimeController = TextEditingController();
   final _endTimeController = TextEditingController();
-  // Controlador para a duração da sessão, REINTRODUZIDO
-  final _sessionDurationController = TextEditingController(text: '1');
 
-  // Estado para guardar o plano do artista, necessário para mostrar/ocultar o campo de duração
+  // Estado para guardar o plano do artista
   Plan _artistPlan = Plan.free;
 
   final Map<String, bool> _workingDays = {
@@ -46,12 +45,13 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  // A variável _isLoading agora está definida.
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // A função de load agora busca todos os dados do artista de uma vez
     _loadArtistData();
   }
 
@@ -59,15 +59,16 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
   void dispose() {
     _startTimeController.dispose();
     _endTimeController.dispose();
-    _sessionDurationController.dispose(); // Limpeza do novo controlador
     super.dispose();
   }
 
-  /// Carrega todos os dados do estúdio: disponibilidade, duração da sessão e plano.
+  /// Carrega os dados de disponibilidade e plano do artista.
   Future<void> _loadArtistData() async {
     final userId = _auth.currentUser?.uid;
-    if (userId == null) return;
-
+    if (userId == null) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
     try {
       final doc = await _db.collection("studios").doc(userId).get();
       if (doc.exists && doc.data() != null) {
@@ -79,9 +80,6 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
         for (var day in _workingDays.keys) {
           _workingDays[day] = savedDays.contains(day);
         }
-        // Carrega a duração da sessão e o plano do artista
-        _sessionDurationController.text =
-            (data['sessionDurationInHours'] ?? 1).toString();
         _artistPlan = Plan.values.firstWhere(
           (e) => e.name == (data['plan'] ?? 'free'),
           orElse: () => Plan.free,
@@ -94,23 +92,19 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
     }
   }
 
-  /// Salva todas as configurações de disponibilidade.
+  /// Salva as configurações de disponibilidade (dias e horas).
   Future<void> _saveAvailability() async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) return;
-    setState(() => _isLoading = true);
+
     final selectedDays = _workingDays.entries
         .where((entry) => entry.value)
         .map((entry) => entry.key)
         .toList();
-
-    // Agora inclui a duração da sessão nos dados a serem salvos
     final availabilityData = {
       'workingDays': selectedDays,
       'startTime': _startTimeController.text.trim(),
       'endTime': _endTimeController.text.trim(),
-      'sessionDurationInHours':
-          int.tryParse(_sessionDurationController.text) ?? 1,
     };
     try {
       await _db.collection("studios").doc(userId).update(availabilityData);
@@ -123,12 +117,10 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Erro ao salvar: ${e.toString()}")));
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  /// Atualiza o status de um agendamento.
+  /// Atualiza o status de um agendamento (confirma ou cancela).
   Future<void> _updateAppointmentStatus(
       String appointmentId, String newStatus) async {
     try {
@@ -159,22 +151,19 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
         title: const Text("Painel do Artista"),
         backgroundColor: Colors.transparent,
       ),
-      body: _isLoading
+      body: _isLoading // A verificação do _isLoading agora funciona.
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              // O corpo principal é um ListView para permitir rolagem de todas as seções
               padding: const EdgeInsets.all(16.0),
               children: [
-                // A secção de "Solicitações Pendentes" que tínhamos implementado permanece aqui
                 const Text("Solicitações Pendentes",
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                _buildPendingAppointmentsList(),
+                _buildPendingAppointmentsList(), // A chamada a esta função agora funciona.
                 const SizedBox(height: 32),
 
-                // A secção de gestão foi unificada
-                const Text("Gerir Disponibilidade e Perfil",
+                const Text("Gerir Perfil e Serviços",
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
@@ -190,25 +179,28 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       side: BorderSide(color: Colors.grey[700]!)),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
-                // CAMPO DE DURAÇÃO DA SESSÃO REINTRODUZIDO
-                // Ele só aparece se o plano do artista não for o "Free"
+                // Botão para gerir serviços só aparece para planos pagos.
                 if (_artistPlan != Plan.free)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: TextField(
-                      controller: _sessionDurationController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                          labelText: "Duração da sessão (em horas)",
-                          border: OutlineInputBorder(),
-                          helperText:
-                              "Ex: 1 para uma hora, 2 para duas horas, etc."),
-                    ),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.style),
+                    label: const Text("Gerir Serviços e Duração"),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const ServiceManagementScreen())),
+                    style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(color: Colors.grey[700]!)),
                   ),
+                const SizedBox(height: 32),
 
-                // Resto do formulário de disponibilidade
+                const Text("Disponibilidade Geral",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
                 const Text("Dias de Trabalho:", style: TextStyle(fontSize: 16)),
                 ..._workingDays.keys.map((day) {
                   return CheckboxListTile(
@@ -245,7 +237,7 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
     );
   }
 
-  /// Widget que busca e exibe os agendamentos pendentes.
+  /// IMPLEMENTAÇÃO COMPLETA do widget que busca e exibe os agendamentos pendentes.
   Widget _buildPendingAppointmentsList() {
     final userId = _auth.currentUser?.uid;
     if (userId == null) return const SizedBox.shrink();
@@ -262,10 +254,12 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
           return Center(child: Text("Erro: ${snapshot.error}"));
         if (snapshot.connectionState == ConnectionState.waiting)
           return const Center(child: CircularProgressIndicator());
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20.0),
-              child: Center(child: Text("Nenhuma solicitação pendente.")));
+            padding: EdgeInsets.symmetric(vertical: 20.0),
+            child: Center(child: Text("Nenhuma solicitação pendente.")),
+          );
+        }
 
         final appointments = snapshot.data!.docs;
         return ListView.builder(
