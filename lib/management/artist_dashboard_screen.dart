@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pc_studio_app/management/portfolio_manager_screen.dart';
-import 'package:pc_studio_app/models/appointment.dart';
-import 'package:intl/intl.dart';
 
 class ArtistDashboardScreen extends StatefulWidget {
   const ArtistDashboardScreen({super.key});
@@ -15,7 +13,7 @@ class ArtistDashboardScreen extends StatefulWidget {
 }
 
 class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
-  // --- O SEU CÓDIGO EXISTENTE PARA GERIR DISPONIBILIDADE FOI MANTIDO ---
+  // Mantemos a lógica para carregar e salvar a disponibilidade do artista.
   final _startTimeController = TextEditingController();
   final _endTimeController = TextEditingController();
 
@@ -108,31 +106,8 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
-  // --- FIM DO SEU CÓDIGO EXISTENTE ---
 
-  /// Função para atualizar o status de um agendamento (confirmar ou cancelar).
-  Future<void> _updateAppointmentStatus(
-      String appointmentId, String newStatus) async {
-    try {
-      await _db
-          .collection('appointments')
-          .doc(appointmentId)
-          .update({'status': newStatus});
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Agendamento ${newStatus == 'confirmed' ? 'confirmado' : 'recusado'}!')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar agendamento: $e')),
-        );
-      }
-    }
-  }
+  // A função '_updateAppointmentStatus' e o widget '_buildPendingAppointmentsList' foram REMOVIDOS.
 
   @override
   Widget build(BuildContext context) {
@@ -141,155 +116,77 @@ class _ArtistDashboardScreenState extends State<ArtistDashboardScreen> {
         title: const Text("Painel do Artista"),
         backgroundColor: Colors.transparent,
       ),
-      // O corpo principal agora é um ListView para permitir a rolagem de todas as seções.
+      // O corpo principal volta a ser um SingleChildScrollView, pois não temos mais a lista complexa.
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
-              children: [
-                // --- SEÇÃO DE SOLICITAÇÕES PENDENTES ---
-                const Text(
-                  "Solicitações Pendentes",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                // Este widget irá construir a lista de agendamentos pendentes.
-                _buildPendingAppointmentsList(),
-                const SizedBox(height: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // A secção de "Solicitações Pendentes" foi REMOVIDA.
 
-                // --- SUA SEÇÃO EXISTENTE PARA GERIR DISPONIBILIDADE ---
-                const Text(
-                  "Gerir Disponibilidade e Perfil",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.photo_library),
-                  label: const Text("Gerir Portfólio"),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const PortfolioManagerScreen()),
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: BorderSide(color: Colors.grey[700]!),
+                  // A secção para gerir disponibilidade e perfil permanece.
+                  const Text(
+                    "Gerir Disponibilidade e Perfil",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Text("Dias de Trabalho:", style: TextStyle(fontSize: 16)),
-                // O seu código para os Checkboxes dos dias da semana.
-                ..._workingDays.keys.map((day) {
-                  return CheckboxListTile(
-                    title: Text(_dayTranslations[day]!),
-                    value: _workingDays[day],
-                    onChanged: (bool? value) {
-                      setState(() => _workingDays[day] = value!);
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text("Gerir Portfólio"),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const PortfolioManagerScreen()),
+                      );
                     },
-                  );
-                }),
-                const SizedBox(height: 16),
-                // Os seus campos de texto para os horários.
-                TextField(
-                  controller: _startTimeController,
-                  decoration: const InputDecoration(
-                      labelText: "Horário de Início (ex: 09:00)",
-                      border: OutlineInputBorder()),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _endTimeController,
-                  decoration: const InputDecoration(
-                      labelText: "Horário de Fim (ex: 18:00)",
-                      border: OutlineInputBorder()),
-                ),
-                const SizedBox(height: 24),
-                // O seu botão para salvar a disponibilidade.
-                ElevatedButton(
-                  onPressed: _saveAvailability,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Colors.grey[700]!),
+                    ),
                   ),
-                  child: const Text("Salvar Disponibilidade",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-    );
-  }
-
-  // --- WIDGET ATUALIZADO ---
-  // Usa um StreamBuilder para buscar e exibir os agendamentos pendentes.
-  Widget _buildPendingAppointmentsList() {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) return const SizedBox.shrink();
-
-    return StreamBuilder<QuerySnapshot>(
-      // Esta consulta irá agora funcionar corretamente com o novo índice.
-      stream: _db
-          .collection('appointments')
-          .where('artistId', isEqualTo: userId)
-          .where('status', isEqualTo: 'pending')
-          .orderBy('dateTime')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(
-              child: Text("Erro ao buscar solicitações: ${snapshot.error}"));
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
-            child: Center(child: Text("Nenhuma solicitação pendente.")),
-          );
-        }
-
-        final appointments = snapshot.data!.docs;
-
-        // Usamos um ListView.builder para criar os itens da lista.
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: appointments.length,
-          itemBuilder: (context, index) {
-            final appointment = Appointment.fromFirestore(appointments[index]);
-            final formattedDate = DateFormat('dd/MM/yyyy \'às\' HH:mm', 'pt_BR')
-                .format(appointment.dateTime);
-
-            return Card(
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              child: ListTile(
-                title: Text(appointment.clientName,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(formattedDate),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.check_circle, color: Colors.green),
-                      onPressed: () =>
-                          _updateAppointmentStatus(appointment.id, 'confirmed'),
-                      tooltip: 'Confirmar',
+                  const SizedBox(height: 16),
+                  const Text("Dias de Trabalho:",
+                      style: TextStyle(fontSize: 16)),
+                  ..._workingDays.keys.map((day) {
+                    return CheckboxListTile(
+                      title: Text(_dayTranslations[day]!),
+                      value: _workingDays[day],
+                      onChanged: (bool? value) {
+                        setState(() => _workingDays[day] = value!);
+                      },
+                    );
+                  }),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _startTimeController,
+                    decoration: const InputDecoration(
+                        labelText: "Horário de Início (ex: 09:00)",
+                        border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _endTimeController,
+                    decoration: const InputDecoration(
+                        labelText: "Horário de Fim (ex: 18:00)",
+                        border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _saveAvailability,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.cancel, color: Colors.red),
-                      onPressed: () =>
-                          _updateAppointmentStatus(appointment.id, 'cancelled'),
-                      tooltip: 'Recusar',
-                    ),
-                  ],
-                ),
+                    child: const Text("Salvar Disponibilidade",
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ],
               ),
-            );
-          },
-        );
-      },
+            ),
     );
   }
 }

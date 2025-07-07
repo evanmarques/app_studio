@@ -65,3 +65,71 @@ O projeto utilizará um modelo de negócio "Freemium", gerando receita através 
 * **Autenticação Social Adicional:** Implementar login com Facebook e Instagram.
 * **Gestão de Estoque:** Implementar a funcionalidade do plano Premium.
 * **Teste de Tatuagem com Realidade Aumentada (AR/IA):** Desenvolver o recurso inovador.
+
+
+
+----
+
+# PC Studio App (Flutter Edition)
+
+## 1. Visão Geral e Objetivo do Projeto
+
+O **PC Studio App** é uma plataforma multiplataforma (Android, iOS, Web) desenvolvida em Flutter, projetada para conectar estúdios e artistas de tatuagem com clientes. O aplicativo serve como um diretório profissional, permitindo que artistas divulguem seus trabalhos e alcancem novos clientes, enquanto oferece aos usuários finais uma ferramenta para descobrir, contatar e agendar sessões com esses profissionais.
+
+## 2. Estratégia de Monetização
+
+O projeto utilizará um modelo de negócio "Freemium", gerando receita através de duas frentes principais:
+
+* **Anúncios para Utilizadores Finais e Artistas Free:** Os clientes que utilizam o aplicativo para buscar artistas, bem como os artistas no plano gratuito, visualizarão anúncios em telas estratégicas.
+* **Planos de Assinatura para Artistas/Estúdios:** Os profissionais terão diferentes níveis de planos, cada um liberando mais funcionalidades.
+
+## 3. Arquitetura e Tecnologias (Pilha Tecnológica)
+
+* **Framework:** Flutter
+* **Linguagem:** Dart
+* **IDE (Ambiente de Desenvolvimento):** Visual Studio Code
+* **Backend como Serviço (BaaS):** Google Firebase
+    * **Autenticação:** Firebase Authentication (E-mail/Senha, Google Sign-In).
+    * **Banco de Dados:** Cloud Firestore (NoSQL).
+    * **Armazenamento de Arquivos:** Cloud Storage (para imagens de perfil e portfólios).
+    * **Notificações:** Firebase Cloud Messaging (FCM).
+
+## 4. Roadmap do Projeto
+
+### Versão 1.0 (MVP Funcional) - CONCLUÍDO
+
+* **Fase 1: Fundação do Projeto:** Configuração do ambiente, criação do repositório e conexão com o Firebase.
+* **Fase 2: UI Base e Navegação:** Estrutura de navegação principal com `BottomNavigationBar` e telas estáticas.
+* **Fase 3: Autenticação de Utilizadores:** Fluxos completos de E-mail/Senha e Login com Google.
+* **Fase 4: Perfis e Gestão de Artista (v1):** Fluxo de registo de estúdio, gestão de portfólio e definição de disponibilidade (dias e horas).
+* **Fase 5: Sistema de Agendamento (v1):**
+    * Cliente pode visualizar disponibilidade (calendário e horários).
+    * Cliente pode solicitar um agendamento.
+    * Artista pode visualizar, aprovar ou recusar solicitações pendentes.
+    * Cliente pode visualizar os seus agendamentos confirmados.
+
+---
+
+### Versão 1.1 (Melhorias de Qualidade de Vida e UX) - EM ANDAMENTO
+
+* **Gestão de Agendamentos (Lado do Cliente):**
+    * [ ] Implementar funcionalidade para o cliente cancelar um agendamento, com um campo para justificar o motivo.
+* **Notificações para o Artista:**
+    * [ ] Exibir um popup ou um indicador visual na tela Home do artista quando existirem agendamentos pendentes.
+* **Melhorias na Gestão do Artista:**
+    * [ ] Tornar a gestão de disponibilidade mais interativa (ex: calendário visual em vez de checkboxes).
+    * [ ] Permitir que artistas de planos pagos definam a duração de uma sessão (ex: 1 hora, 2 horas).
+* **Melhorias na Experiência do Cliente:**
+    * [ ] Permitir que o cliente selecione múltiplos horários consecutivos (para sessões mais longas).
+    * [ ] Adicionar um popup na Home do cliente para lembretes de agendamentos próximos.
+    * [ ] Tornar a tela de Perfil do utilizador mais rica (sugestões em aberto).
+
+### Versão 2.0 (Monetização e Funcionalidades Avançadas) - A FAZER
+
+* **Implementação de Anúncios:**
+    * [ ] Integrar o Google AdMob para exibir anúncios para utilizadores e artistas do plano "Free".
+* **Login Social Adicional:**
+    * [ ] Implementar o Login com Facebook.
+* **Funcionalidades Premium:**
+    * [ ] Gestão de Estoque e Vendas de produtos.
+    * [ ] Recurso de Teste de Tatuagem com Realidade Aumentada (AR).

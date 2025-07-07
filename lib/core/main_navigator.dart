@@ -1,31 +1,47 @@
+// lib/core/main_navigator.dart
+
 import 'package:flutter/material.dart';
-// --- CAMINHOS DE IMPORT CORRIGIDOS ---
 import 'package:pc_studio_app/features/appointments/appointments_screen.dart';
 import 'package:pc_studio_app/features/artists/artists_screen.dart';
 import 'package:pc_studio_app/features/home/home_screen.dart';
 import 'package:pc_studio_app/features/profile/profile_screen.dart';
 
+/// O widget de navegação principal da aplicação.
+/// AGORA ACEITA UM PARÂMETRO PARA DEFINIR O ÍNDICE INICIAL.
 class MainNavigator extends StatefulWidget {
-  const MainNavigator({super.key});
+  // 1. NOVO PARÂMETRO: Opcional, para definir qual aba deve ser aberta inicialmente.
+  final int initialIndex;
+
+  // O valor padrão é 0 (a aba 'Início').
+  const MainNavigator({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigator> createState() => _MainNavigatorState();
 }
 
 class _MainNavigatorState extends State<MainNavigator> {
-  int _selectedIndex = 0;
+  // O índice da aba selecionada.
+  late int _selectedIndex;
 
-  // A lista de widgets que correspondem a cada aba da navegação.
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomeScreen(),
-    ArtistsScreen(),
-    AppointmentsScreen(),
-    ProfileScreen(),
+  @override
+  void initState() {
+    super.initState();
+    // 2. O índice selecionado agora começa com o valor que foi passado para o widget.
+    _selectedIndex = widget.initialIndex;
+  }
+
+  // A lista de ecrãs que correspondem a cada aba da navegação.
+  static final List<Widget> _widgetOptions = <Widget>[
+    // Passamos uma função para a HomeScreen que permite que ela mude a aba.
+    HomeScreen(
+        onNavigateToPage: (index) {}), // Será atualizado no próximo passo
+    const ArtistsScreen(),
+    const AppointmentsScreen(),
+    const ProfileScreen(),
   ];
 
   // Função chamada quando um item da barra de navegação é tocado.
   void _onItemTapped(int index) {
-    // setState notifica o Flutter que o estado mudou, e a UI precisa ser redesenhada.
     setState(() {
       _selectedIndex = index;
     });
@@ -33,39 +49,33 @@ class _MainNavigatorState extends State<MainNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    // Para que a HomeScreen possa chamar a função _onItemTapped,
+    // precisamos de reconstruir a lista de widgets aqui.
+    final List<Widget> currentWidgetOptions = <Widget>[
+      HomeScreen(onNavigateToPage: _onItemTapped),
+      const ArtistsScreen(),
+      const AppointmentsScreen(),
+      const ProfileScreen(),
+    ];
+
     return Scaffold(
-      // Exibe o widget selecionado da lista _widgetOptions.
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: currentWidgetOptions.elementAt(_selectedIndex),
       ),
-      // A barra de navegação inferior.
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
+          BottomNavigationBarItem(icon: Icon(Icons.brush), label: 'Artistas'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Início',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.brush),
-            label: 'Artistas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Agenda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
+              icon: Icon(Icons.calendar_month), label: 'Agenda'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        // Estilização para o tema escuro.
         backgroundColor: Colors.grey[900],
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey[600],
-        type: BottomNavigationBarType
-            .fixed, // Garante que todos os labels apareçam.
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }
