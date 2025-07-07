@@ -5,18 +5,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pc_studio_app/models/artist.dart';
 import 'package:pc_studio_app/models/appointment.dart';
+import 'package:pc_studio_app/models/tattoo_service.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
 class BookingScreen extends StatefulWidget {
   final Artist artist;
-  const BookingScreen({super.key, required this.artist});
+  final TattooService selectedService;
+
+  const BookingScreen({
+    super.key,
+    required this.artist,
+    required this.selectedService,
+  });
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
 }
 
 class _BookingScreenState extends State<BookingScreen> {
+  // Variáveis de estado da tela
   late Artist _latestArtistData;
   bool _isArtistDataLoading = true;
   DateTime _focusedDay = DateTime.now();
@@ -27,6 +35,7 @@ class _BookingScreenState extends State<BookingScreen> {
   bool _isLoadingTimes = false;
   bool _isBooking = false;
 
+  // Mapa para conversão de dias da semana
   final Map<String, int> _dayOfWeekMap = {
     'monday': DateTime.monday,
     'tuesday': DateTime.tuesday,
@@ -43,12 +52,15 @@ class _BookingScreenState extends State<BookingScreen> {
     _fetchLatestArtistData();
   }
 
+  /// Busca os dados mais recentes do artista para garantir que a disponibilidade está correta.
   Future<void> _fetchLatestArtistData() async {
     try {
       final doc = await FirebaseFirestore.instance
           .collection('studios')
           .doc(widget.artist.uid)
           .get();
+      if (!mounted) return; // Verificação de segurança
+
       if (doc.exists) {
         _latestArtistData = Artist.fromMap(doc.data()!);
         if (_isDayEnabled(DateTime.now())) {
@@ -62,14 +74,11 @@ class _BookingScreenState extends State<BookingScreen> {
       _latestArtistData = widget.artist;
       print("Erro ao buscar dados do artista: $e");
     } finally {
-      if (mounted) {
-        setState(() {
-          _isArtistDataLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isArtistDataLoading = false);
     }
   }
 
+  /// Verifica se um dia da semana está habilitado no perfil do artista.
   bool _isDayEnabled(DateTime day) {
     final enabledWeekdays = _latestArtistData.workingDays
         .map((dayString) => _dayOfWeekMap[dayString])
@@ -77,11 +86,13 @@ class _BookingScreenState extends State<BookingScreen> {
     return enabledWeekdays.contains(day.weekday);
   }
 
+  /// Converte uma string de hora (ex: "09:00") para um objeto TimeOfDay.
   TimeOfDay _parseTime(String time) {
     final parts = time.split(':');
     return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
+  /// Gera a lista de horários disponíveis para um dia, considerando a duração da sessão e os agendamentos existentes.
   Future<void> _generateAvailableTimeSlots(DateTime day) async {
     setState(() {
       _isLoadingTimes = true;
@@ -91,9 +102,8 @@ class _BookingScreenState extends State<BookingScreen> {
     try {
       final startTime = _parseTime(_latestArtistData.startTime ?? '09:00');
       final endTime = _parseTime(_latestArtistData.endTime ?? '18:00');
-      // Agora o 'sessionDurationInHours' existe no modelo Artist e não dará erro.
       final sessionDuration =
-          Duration(hours: _latestArtistData.sessionDurationInHours);
+          Duration(hours: widget.selectedService.durationInHours);
 
       final startOfDay = DateTime(day.year, day.month, day.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
@@ -132,12 +142,14 @@ class _BookingScreenState extends State<BookingScreen> {
         _availableTimeSlots = availableSlots;
       });
     } finally {
-      setState(() {
-        _isLoadingTimes = false;
-      });
+      if (mounted)
+        setState(() {
+          _isLoadingTimes = false;
+        });
     }
   }
 
+  /// Salva o novo agendamento no Firestore.
   Future<void> _confirmBooking() async {
     if (_selectedDay == null || _selectedTime == null) return;
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -154,6 +166,10 @@ class _BookingScreenState extends State<BookingScreen> {
         'clientName': currentUser.displayName ?? 'Utilizador sem nome',
         'dateTime': Timestamp.fromDate(bookingDateTime),
         'status': 'pending',
+        'serviceStyle':
+            widget.selectedService.style, // Guardamos o serviço escolhido
+        'serviceSize': widget.selectedService.size,
+        'serviceDuration': widget.selectedService.durationInHours,
       };
       await FirebaseFirestore.instance
           .collection('appointments')
@@ -161,13 +177,13 @@ class _BookingScreenState extends State<BookingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Solicitação de agendamento enviada com sucesso!')));
-        Navigator.of(context).pop();
+        Navigator.of(context)
+            .popUntil((route) => route.isFirst); // Volta para a tela Home
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Erro ao confirmar agendamento: ${e.toString()}')));
-      }
     } finally {
       if (mounted) setState(() => _isBooking = false);
     }
@@ -198,7 +214,7 @@ class _BookingScreenState extends State<BookingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Selecione uma data",
+                  Text("1. Selecione uma data",
                       style: Theme.of(context).textTheme.headlineSmall),
                   const SizedBox(height: 16),
                   Card(
@@ -228,25 +244,30 @@ class _BookingScreenState extends State<BookingScreen> {
                         }
                       },
                       calendarStyle: CalendarStyle(
-                          disabledTextStyle: TextStyle(color: Colors.grey[600]),
-                          todayDecoration: BoxDecoration(
-                              color: Colors.purple.withOpacity(0.5),
-                              shape: BoxShape.circle),
-                          selectedDecoration: const BoxDecoration(
-                              color: Colors.purple, shape: BoxShape.circle)),
+                        disabledTextStyle: TextStyle(color: Colors.grey[600]),
+                        todayDecoration: BoxDecoration(
+                            color: Colors.purple.withOpacity(0.5),
+                            shape: BoxShape.circle),
+                        selectedDecoration: const BoxDecoration(
+                            color: Colors.purple, shape: BoxShape.circle),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
                   if (_selectedDay != null)
-                    Text(
-                        "Horários para ${DateFormat('dd/MM/yyyy', 'pt_BR').format(_selectedDay!)}:",
+                    Text("2. Escolha um horário",
                         style: Theme.of(context).textTheme.headlineSmall),
                   const SizedBox(height: 8),
                   if (_selectedDay != null)
-                    Text(
-                      "Cada horário representa um bloco de ${_latestArtistData.sessionDurationInHours} hora(s).",
-                      style: const TextStyle(
-                          color: Colors.grey, fontStyle: FontStyle.italic),
+                    Card(
+                      color: Colors.white10,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Serviço selecionado: ${widget.selectedService.style} - ${widget.selectedService.size} (${widget.selectedService.durationInHours}h).",
+                          style: const TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
                     ),
                   const SizedBox(height: 16),
                   if (_isLoadingTimes)
@@ -270,10 +291,11 @@ class _BookingScreenState extends State<BookingScreen> {
                             });
                           },
                           style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  isSelected ? Colors.purple : Colors.grey[800],
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8))),
+                            backgroundColor:
+                                isSelected ? Colors.purple : Colors.grey[800],
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
                           child: Text(time.format(context),
                               style: TextStyle(
                                   color: isSelected
