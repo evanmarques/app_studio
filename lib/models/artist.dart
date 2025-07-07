@@ -2,26 +2,25 @@
 
 // Define o modelo de dados para um perfil de Artista/Estúdio.
 class Artist {
-  // Propriedades do modelo.
-  final String
-      uid; // ID do utilizador do Firebase Auth, usado como ID do documento.
-  final String studioName; // Nome do estúdio ou nome artístico.
-  final String ownerName; // Nome do proprietário.
-  final String email; // Email de contacto.
-  final String plan; // O plano de assinatura (ex: "free", "basic").
-  String? profileImageUrl; // URL da imagem de perfil (opcional).
-  String? instagramUrl; // URL do Instagram (opcional).
-  String? whatsappNumber; // Número do WhatsApp (opcional).
-  String? facebookUrl; // URL do Facebook (opcional).
-  List<String> specialties; // Lista de especialidades do artista.
-  List<String> portfolioImageUrls; // Lista de URLs das imagens do portfólio.
+  final String uid;
+  final String studioName;
+  final String ownerName;
+  final String email;
+  final String plan;
+  String? profileImageUrl;
+  String? instagramUrl;
+  String? whatsappNumber;
+  String? facebookUrl;
+  List<String> specialties;
+  List<String> portfolioImageUrls;
+  List<String> workingDays;
+  String? startTime;
+  String? endTime;
 
-  // NOVOS CAMPOS PARA AGENDAMENTO
-  List<String> workingDays; // Lista de dias da semana (ex: 'monday', 'tuesday')
-  String? startTime; // Hora de início do trabalho (ex: '09:00')
-  String? endTime; // Hora de fim do trabalho (ex: '18:00')
+  // 1. NOVO CAMPO ADICIONADO PARA A DURAÇÃO DA SESSÃO
+  int sessionDurationInHours;
 
-  // Construtor da classe.
+  // Construtor atualizado para incluir o novo campo.
   Artist({
     required this.uid,
     required this.studioName,
@@ -34,13 +33,14 @@ class Artist {
     this.facebookUrl,
     this.specialties = const [],
     this.portfolioImageUrls = const [],
-    // Inicialização dos novos campos
     this.workingDays = const [],
     this.startTime,
     this.endTime,
+    // O valor padrão para a duração da sessão é 1 hora.
+    this.sessionDurationInHours = 1,
   });
 
-  // Construtor de fábrica para criar um Artista a partir de um mapa do Firestore.
+  /// Constrói um objeto Artist a partir de um mapa do Firestore.
   factory Artist.fromMap(Map<String, dynamic> map) {
     return Artist(
       uid: map['uid'] ?? '',
@@ -52,17 +52,17 @@ class Artist {
       instagramUrl: map['instagramUrl'],
       whatsappNumber: map['whatsappNumber'],
       facebookUrl: map['facebookUrl'],
-      // Converte a string de especialidades de volta para uma lista
       specialties: (map['specialty'] as String?)?.split(', ').toList() ?? [],
       portfolioImageUrls: List<String>.from(map['portfolioImageUrls'] ?? []),
-      // Converte os novos campos do Firestore para o nosso modelo
       workingDays: List<String>.from(map['workingDays'] ?? []),
       startTime: map['startTime'],
       endTime: map['endTime'],
+      // Carrega a duração da sessão do Firestore, com um fallback para 1.
+      sessionDurationInHours: map['sessionDurationInHours'] ?? 1,
     );
   }
 
-  // Método para converter o objeto Artist num formato (Map) que o Firestore entende.
+  /// Converte o objeto Artist num mapa para guardar no Firestore.
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -76,10 +76,11 @@ class Artist {
       'facebookUrl': facebookUrl,
       'specialty': specialties.join(', '),
       'portfolioImageUrls': portfolioImageUrls,
-      // Adiciona os novos campos ao mapa para guardar no Firestore
       'workingDays': workingDays,
       'startTime': startTime,
       'endTime': endTime,
+      // Adiciona o novo campo ao mapa para ser salvo.
+      'sessionDurationInHours': sessionDurationInHours,
     };
   }
 }

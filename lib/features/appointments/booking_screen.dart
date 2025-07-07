@@ -17,6 +17,8 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
+  late Artist _latestArtistData;
+  bool _isArtistDataLoading = true;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -38,22 +40,39 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   void initState() {
     super.initState();
-    // A inicialização global no main.dart já cuida disso.
-    if (_isDayEnabled(DateTime.now())) {
-      _selectedDay = _focusedDay;
-      _generateAvailableTimeSlots(_selectedDay!);
+    _fetchLatestArtistData();
+  }
+
+  Future<void> _fetchLatestArtistData() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('studios')
+          .doc(widget.artist.uid)
+          .get();
+      if (doc.exists) {
+        _latestArtistData = Artist.fromMap(doc.data()!);
+        if (_isDayEnabled(DateTime.now())) {
+          _selectedDay = _focusedDay;
+          _generateAvailableTimeSlots(_selectedDay!);
+        }
+      } else {
+        _latestArtistData = widget.artist;
+      }
+    } catch (e) {
+      _latestArtistData = widget.artist;
+      print("Erro ao buscar dados do artista: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isArtistDataLoading = false;
+        });
+      }
     }
   }
 
-  // A lógica desta função está correta, mas ela retorna 'false' para todos os dias
-  // se a lista 'workingDays' do artista estiver vazia.
   bool _isDayEnabled(DateTime day) {
-    if (widget.artist.workingDays.isEmpty) {
-      return false; // Se a lista de dias de trabalho estiver vazia, desabilita todos os dias.
-    }
-    final enabledWeekdays = widget.artist.workingDays
+    final enabledWeekdays = _latestArtistData.workingDays
         .map((dayString) => _dayOfWeekMap[dayString])
-        .where((dayInt) => dayInt != null) // Filtra dias inválidos
         .toSet();
     return enabledWeekdays.contains(day.weekday);
   }
@@ -64,21 +83,24 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<void> _generateAvailableTimeSlots(DateTime day) async {
-    // (O resto desta função permanece inalterado)
     setState(() {
       _isLoadingTimes = true;
       _availableTimeSlots = [];
       _selectedTime = null;
     });
     try {
-      final startTime = _parseTime(widget.artist.startTime ?? '09:00');
-      final endTime = _parseTime(widget.artist.endTime ?? '18:00');
+      final startTime = _parseTime(_latestArtistData.startTime ?? '09:00');
+      final endTime = _parseTime(_latestArtistData.endTime ?? '18:00');
+      // Agora o 'sessionDurationInHours' existe no modelo Artist e não dará erro.
+      final sessionDuration =
+          Duration(hours: _latestArtistData.sessionDurationInHours);
+
       final startOfDay = DateTime(day.year, day.month, day.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
       final querySnapshot = await FirebaseFirestore.instance
           .collection('appointments')
-          .where('artistId', isEqualTo: widget.artist.uid)
+          .where('artistId', isEqualTo: _latestArtistData.uid)
           .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
           .where('dateTime', isLessThan: endOfDay)
           .get();
@@ -87,19 +109,25 @@ class _BookingScreenState extends State<BookingScreen> {
           .map((doc) =>
               TimeOfDay.fromDateTime(Appointment.fromFirestore(doc).dateTime))
           .toSet();
+
       List<TimeOfDay> potentialSlots = [];
       DateTime currentTime = startOfDay
           .add(Duration(hours: startTime.hour, minutes: startTime.minute));
       DateTime workEndTime = startOfDay
           .add(Duration(hours: endTime.hour, minutes: endTime.minute));
-      while (currentTime.isBefore(workEndTime)) {
+
+      while (currentTime
+          .add(sessionDuration)
+          .isBefore(workEndTime.add(const Duration(seconds: 1)))) {
         potentialSlots.add(TimeOfDay.fromDateTime(currentTime));
-        currentTime = currentTime.add(const Duration(hours: 1));
+        currentTime = currentTime.add(sessionDuration);
       }
+
       final availableSlots = potentialSlots
           .where((slot) => !bookedTimes.any((booked) =>
               booked.hour == slot.hour && booked.minute == slot.minute))
           .toList();
+
       setState(() {
         _availableTimeSlots = availableSlots;
       });
@@ -113,49 +141,32 @@ class _BookingScreenState extends State<BookingScreen> {
   Future<void> _confirmBooking() async {
     if (_selectedDay == null || _selectedTime == null) return;
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Precisa de estar logado para agendar.')));
-      return;
-    }
+    if (currentUser == null) return;
 
     setState(() => _isBooking = true);
-
     try {
-      final bookingDateTime = DateTime(
-        _selectedDay!.year,
-        _selectedDay!.month,
-        _selectedDay!.day,
-        _selectedTime!.hour,
-        _selectedTime!.minute,
-      );
-
+      final bookingDateTime = DateTime(_selectedDay!.year, _selectedDay!.month,
+          _selectedDay!.day, _selectedTime!.hour, _selectedTime!.minute);
       final newAppointment = {
-        'artistId': widget.artist.uid,
-        'artistName': widget.artist.studioName,
+        'artistId': _latestArtistData.uid,
+        'artistName': _latestArtistData.studioName,
         'clientId': currentUser.uid,
         'clientName': currentUser.displayName ?? 'Utilizador sem nome',
         'dateTime': Timestamp.fromDate(bookingDateTime),
-        'status':
-            'pending', //O status inicial agora é 'pending' para aguardar a confirmação do artista.
+        'status': 'pending',
       };
-
       await FirebaseFirestore.instance
           .collection('appointments')
           .add(newAppointment);
-
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Solicitação de agendamento enviada!')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Solicitação de agendamento enviada com sucesso!')));
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Erro ao confirmar agendamento: ${e.toString()}')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Erro ao confirmar agendamento: ${e.toString()}')));
       }
     } finally {
       if (mounted) setState(() => _isBooking = false);
@@ -166,7 +177,9 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Agendar com ${widget.artist.studioName}'),
+        title: Text(_isArtistDataLoading
+            ? 'A carregar...'
+            : 'Agendar com ${_latestArtistData.studioName}'),
         backgroundColor: Colors.transparent,
       ),
       floatingActionButton: _selectedDay != null && _selectedTime != null
@@ -174,24 +187,12 @@ class _BookingScreenState extends State<BookingScreen> {
               onPressed: _isBooking ? null : _confirmBooking,
               label: _isBooking
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("Confirmar Agendamento"),
+                  : const Text("Solicitar Horário"),
               icon: _isBooking ? null : const Icon(Icons.check),
             )
           : null,
-      // 1. Verificamos se o artista configurou seus dias de trabalho.
-      body: widget.artist.workingDays.isEmpty
-          // 2. Se a lista de dias estiver vazia, mostramos uma mensagem informativa.
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24.0),
-                child: Text(
-                  "Este artista ainda não configurou a sua agenda de trabalho. Não é possível agendar no momento.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ),
-            )
-          // 3. Se houver dias de trabalho, construímos a tela normalmente.
+      body: _isArtistDataLoading
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -210,8 +211,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       calendarFormat: _calendarFormat,
                       selectedDayPredicate: (day) =>
                           isSameDay(_selectedDay, day),
-                      enabledDayPredicate:
-                          _isDayEnabled, // Esta função agora funciona como esperado.
+                      enabledDayPredicate: _isDayEnabled,
                       onDaySelected: (selectedDay, focusedDay) {
                         if (!_isDayEnabled(selectedDay)) return;
                         setState(() {
@@ -222,7 +222,9 @@ class _BookingScreenState extends State<BookingScreen> {
                       },
                       onFormatChanged: (format) {
                         if (_calendarFormat != format) {
-                          setState(() => _calendarFormat = format);
+                          setState(() {
+                            _calendarFormat = format;
+                          });
                         }
                       },
                       calendarStyle: CalendarStyle(
@@ -239,6 +241,13 @@ class _BookingScreenState extends State<BookingScreen> {
                     Text(
                         "Horários para ${DateFormat('dd/MM/yyyy', 'pt_BR').format(_selectedDay!)}:",
                         style: Theme.of(context).textTheme.headlineSmall),
+                  const SizedBox(height: 8),
+                  if (_selectedDay != null)
+                    Text(
+                      "Cada horário representa um bloco de ${_latestArtistData.sessionDurationInHours} hora(s).",
+                      style: const TextStyle(
+                          color: Colors.grey, fontStyle: FontStyle.italic),
+                    ),
                   const SizedBox(height: 16),
                   if (_isLoadingTimes)
                     const Center(child: CircularProgressIndicator())
@@ -255,7 +264,11 @@ class _BookingScreenState extends State<BookingScreen> {
                       children: _availableTimeSlots.map((time) {
                         final isSelected = _selectedTime == time;
                         return ElevatedButton(
-                          onPressed: () => setState(() => _selectedTime = time),
+                          onPressed: () {
+                            setState(() {
+                              _selectedTime = time;
+                            });
+                          },
                           style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   isSelected ? Colors.purple : Colors.grey[800],
