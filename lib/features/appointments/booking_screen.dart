@@ -24,13 +24,11 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  // Variáveis de estado da tela
-  late Artist _latestArtistData;
-  bool _isArtistDataLoading = true;
+  // Variáveis de estado para controlar a UI
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  TimeOfDay? _selectedTime;
+  List<TimeOfDay> _selectedTimeSlots = [];
   List<TimeOfDay> _availableTimeSlots = [];
   bool _isLoadingTimes = false;
   bool _isBooking = false;
@@ -46,41 +44,9 @@ class _BookingScreenState extends State<BookingScreen> {
     'sunday': DateTime.sunday,
   };
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchLatestArtistData();
-  }
-
-  /// Busca os dados mais recentes do artista para garantir que a disponibilidade está correta.
-  Future<void> _fetchLatestArtistData() async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('studios')
-          .doc(widget.artist.uid)
-          .get();
-      if (!mounted) return; // Verificação de segurança
-
-      if (doc.exists) {
-        _latestArtistData = Artist.fromMap(doc.data()!);
-        if (_isDayEnabled(DateTime.now())) {
-          _selectedDay = _focusedDay;
-          _generateAvailableTimeSlots(_selectedDay!);
-        }
-      } else {
-        _latestArtistData = widget.artist;
-      }
-    } catch (e) {
-      _latestArtistData = widget.artist;
-      print("Erro ao buscar dados do artista: $e");
-    } finally {
-      if (mounted) setState(() => _isArtistDataLoading = false);
-    }
-  }
-
   /// Verifica se um dia da semana está habilitado no perfil do artista.
   bool _isDayEnabled(DateTime day) {
-    final enabledWeekdays = _latestArtistData.workingDays
+    final enabledWeekdays = widget.artist.workingDays
         .map((dayString) => _dayOfWeekMap[dayString])
         .toSet();
     return enabledWeekdays.contains(day.weekday);
@@ -92,25 +58,24 @@ class _BookingScreenState extends State<BookingScreen> {
     return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
-  /// Gera a lista de horários disponíveis para um dia, considerando a duração da sessão e os agendamentos existentes.
+  /// Gera a lista de horários disponíveis para um dia.
   Future<void> _generateAvailableTimeSlots(DateTime day) async {
     setState(() {
       _isLoadingTimes = true;
       _availableTimeSlots = [];
-      _selectedTime = null;
+      _selectedTimeSlots.clear();
     });
     try {
-      final startTime = _parseTime(_latestArtistData.startTime ?? '09:00');
-      final endTime = _parseTime(_latestArtistData.endTime ?? '18:00');
+      final startTime = _parseTime(widget.artist.startTime ?? '09:00');
+      final endTime = _parseTime(widget.artist.endTime ?? '18:00');
       final sessionDuration =
           Duration(hours: widget.selectedService.durationInHours);
-
       final startOfDay = DateTime(day.year, day.month, day.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
       final querySnapshot = await FirebaseFirestore.instance
           .collection('appointments')
-          .where('artistId', isEqualTo: _latestArtistData.uid)
+          .where('artistId', isEqualTo: widget.artist.uid)
           .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
           .where('dateTime', isLessThan: endOfDay)
           .get();
@@ -138,9 +103,10 @@ class _BookingScreenState extends State<BookingScreen> {
               booked.hour == slot.hour && booked.minute == slot.minute))
           .toList();
 
-      setState(() {
-        _availableTimeSlots = availableSlots;
-      });
+      if (mounted)
+        setState(() {
+          _availableTimeSlots = availableSlots;
+        });
     } finally {
       if (mounted)
         setState(() {
@@ -149,27 +115,63 @@ class _BookingScreenState extends State<BookingScreen> {
     }
   }
 
+  /// Lida com o toque em um horário, adicionando ou removendo da lista de seleção.
+  void _onTimeSlotTapped(TimeOfDay tappedTime) {
+    setState(() {
+      final isSelected = _selectedTimeSlots.contains(tappedTime);
+      if (isSelected) {
+        _selectedTimeSlots.remove(tappedTime);
+      } else {
+        _selectedTimeSlots.add(tappedTime);
+      }
+      _selectedTimeSlots.sort(
+          (a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
+    });
+  }
+
+  /// Valida se os horários selecionados são consecutivos.
+  bool _areSelectedSlotsConsecutive() {
+    if (_selectedTimeSlots.length <= 1) return true;
+    for (int i = 0; i < _selectedTimeSlots.length - 1; i++) {
+      final currentSlot = _selectedTimeSlots[i];
+      final nextSlot = _selectedTimeSlots[i + 1];
+      final currentInMinutes = currentSlot.hour * 60 + currentSlot.minute;
+      final nextInMinutes = nextSlot.hour * 60 + nextSlot.minute;
+      final expectedNextInMinutes =
+          currentInMinutes + (widget.selectedService.durationInHours * 60);
+      if (nextInMinutes != expectedNextInMinutes) return false;
+    }
+    return true;
+  }
+
   /// Salva o novo agendamento no Firestore.
   Future<void> _confirmBooking() async {
-    if (_selectedDay == null || _selectedTime == null) return;
+    if (_selectedDay == null || _selectedTimeSlots.isEmpty) return;
+    if (!_areSelectedSlotsConsecutive()) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Por favor, selecione apenas horários consecutivos.')));
+      return;
+    }
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return;
 
     setState(() => _isBooking = true);
     try {
+      final firstSlot = _selectedTimeSlots.first;
       final bookingDateTime = DateTime(_selectedDay!.year, _selectedDay!.month,
-          _selectedDay!.day, _selectedTime!.hour, _selectedTime!.minute);
+          _selectedDay!.day, firstSlot.hour, firstSlot.minute);
+      final totalDuration =
+          widget.selectedService.durationInHours * _selectedTimeSlots.length;
       final newAppointment = {
-        'artistId': _latestArtistData.uid,
-        'artistName': _latestArtistData.studioName,
+        'artistId': widget.artist.uid,
+        'artistName': widget.artist.studioName,
         'clientId': currentUser.uid,
         'clientName': currentUser.displayName ?? 'Utilizador sem nome',
         'dateTime': Timestamp.fromDate(bookingDateTime),
         'status': 'pending',
-        'serviceStyle':
-            widget.selectedService.style, // Guardamos o serviço escolhido
+        'serviceStyle': widget.selectedService.style,
         'serviceSize': widget.selectedService.size,
-        'serviceDuration': widget.selectedService.durationInHours,
+        'serviceDuration': totalDuration,
       };
       await FirebaseFirestore.instance
           .collection('appointments')
@@ -177,8 +179,7 @@ class _BookingScreenState extends State<BookingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Solicitação de agendamento enviada com sucesso!')));
-        Navigator.of(context)
-            .popUntil((route) => route.isFirst); // Volta para a tela Home
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (e) {
       if (mounted)
@@ -191,90 +192,86 @@ class _BookingScreenState extends State<BookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final canConfirm =
+        _selectedTimeSlots.isNotEmpty && _areSelectedSlotsConsecutive();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isArtistDataLoading
-            ? 'A carregar...'
-            : 'Agendar com ${_latestArtistData.studioName}'),
-        backgroundColor: Colors.transparent,
-      ),
-      floatingActionButton: _selectedDay != null && _selectedTime != null
+          title: Text('Agendar com ${widget.artist.studioName}'),
+          backgroundColor: Colors.transparent),
+      floatingActionButton: canConfirm
           ? FloatingActionButton.extended(
               onPressed: _isBooking ? null : _confirmBooking,
               label: _isBooking
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("Solicitar Horário"),
+                  : const Text("Solicitar Horário(s)"),
               icon: _isBooking ? null : const Icon(Icons.check),
             )
           : null,
-      body: _isArtistDataLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("1. Selecione uma data",
+                style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 16),
+            Card(
+              clipBehavior: Clip.antiAlias,
+              child: TableCalendar(
+                locale: 'pt_BR',
+                firstDay: DateTime.now(),
+                lastDay: DateTime.now().add(const Duration(days: 90)),
+                focusedDay: _focusedDay,
+                calendarFormat: _calendarFormat,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                enabledDayPredicate: _isDayEnabled,
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (!_isDayEnabled(selectedDay)) return;
+                  setState(() {
+                    _selectedDay = selectedDay;
+                    _focusedDay = focusedDay;
+                  });
+                  _generateAvailableTimeSlots(selectedDay);
+                },
+                onFormatChanged: (format) {
+                  if (_calendarFormat != format)
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                },
+                calendarStyle: CalendarStyle(
+                  disabledTextStyle: TextStyle(color: Colors.grey[600]),
+                  todayDecoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.5),
+                      shape: BoxShape.circle),
+                  selectedDecoration: const BoxDecoration(
+                      color: Colors.purple, shape: BoxShape.circle),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            if (_selectedDay != null)
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("1. Selecione uma data",
+                  Text("2. Escolha um ou mais horários",
                       style: Theme.of(context).textTheme.headlineSmall),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   Card(
-                    clipBehavior: Clip.antiAlias,
-                    child: TableCalendar(
-                      locale: 'pt_BR',
-                      firstDay: DateTime.now(),
-                      lastDay: DateTime.now().add(const Duration(days: 90)),
-                      focusedDay: _focusedDay,
-                      calendarFormat: _calendarFormat,
-                      selectedDayPredicate: (day) =>
-                          isSameDay(_selectedDay, day),
-                      enabledDayPredicate: _isDayEnabled,
-                      onDaySelected: (selectedDay, focusedDay) {
-                        if (!_isDayEnabled(selectedDay)) return;
-                        setState(() {
-                          _selectedDay = selectedDay;
-                          _focusedDay = focusedDay;
-                        });
-                        _generateAvailableTimeSlots(selectedDay);
-                      },
-                      onFormatChanged: (format) {
-                        if (_calendarFormat != format) {
-                          setState(() {
-                            _calendarFormat = format;
-                          });
-                        }
-                      },
-                      calendarStyle: CalendarStyle(
-                        disabledTextStyle: TextStyle(color: Colors.grey[600]),
-                        todayDecoration: BoxDecoration(
-                            color: Colors.purple.withOpacity(0.5),
-                            shape: BoxShape.circle),
-                        selectedDecoration: const BoxDecoration(
-                            color: Colors.purple, shape: BoxShape.circle),
+                    color: Colors.white10,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Serviço selecionado: ${widget.selectedService.style} - ${widget.selectedService.size} (${widget.selectedService.durationInHours}h por bloco).",
+                        style: const TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  if (_selectedDay != null)
-                    Text("2. Escolha um horário",
-                        style: Theme.of(context).textTheme.headlineSmall),
-                  const SizedBox(height: 8),
-                  if (_selectedDay != null)
-                    Card(
-                      color: Colors.white10,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Serviço selecionado: ${widget.selectedService.style} - ${widget.selectedService.size} (${widget.selectedService.durationInHours}h).",
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ),
-                    ),
                   const SizedBox(height: 16),
                   if (_isLoadingTimes)
                     const Center(child: CircularProgressIndicator())
-                  else if (!_isLoadingTimes &&
-                      _availableTimeSlots.isEmpty &&
-                      _selectedDay != null)
+                  else if (_availableTimeSlots.isEmpty)
                     const Center(
                         child:
                             Text("Nenhum horário disponível para esta data."))
@@ -283,19 +280,14 @@ class _BookingScreenState extends State<BookingScreen> {
                       spacing: 8.0,
                       runSpacing: 8.0,
                       children: _availableTimeSlots.map((time) {
-                        final isSelected = _selectedTime == time;
+                        final isSelected = _selectedTimeSlots.contains(time);
                         return ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedTime = time;
-                            });
-                          },
+                          onPressed: () => _onTimeSlotTapped(time),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                isSelected ? Colors.purple : Colors.grey[800],
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
+                              backgroundColor:
+                                  isSelected ? Colors.purple : Colors.grey[800],
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8))),
                           child: Text(time.format(context),
                               style: TextStyle(
                                   color: isSelected
@@ -304,10 +296,12 @@ class _BookingScreenState extends State<BookingScreen> {
                         );
                       }).toList(),
                     ),
-                  const SizedBox(height: 80),
                 ],
               ),
-            ),
+            const SizedBox(height: 80),
+          ],
+        ),
+      ),
     );
   }
 }
