@@ -7,14 +7,11 @@ import 'package:pc_studio_app/features/common/fullscreen_image_viewer.dart';
 import 'package:pc_studio_app/models/plan.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-/// Modelo de dados para representar um Estilo de Tatuagem.
-/// Reintroduzido neste ficheiro para manter a lógica da HomeScreen autónoma.
+// O modelo TattooStyle permanece como está.
 class TattooStyle {
   final String name;
   final String imageUrl;
-
   TattooStyle({required this.name, required this.imageUrl});
-
   factory TattooStyle.fromFirestore(Map<String, dynamic> data) {
     return TattooStyle(
       name: data['name'] ?? 'Sem Nome',
@@ -23,8 +20,6 @@ class TattooStyle {
   }
 }
 
-/// A tela principal da aplicação.
-/// Agora exibe um carrossel de estilos e alertas condicionais para artistas.
 class HomeScreen extends StatefulWidget {
   final Function(int) onNavigateToPage;
   const HomeScreen({super.key, required this.onNavigateToPage});
@@ -34,39 +29,31 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // --- Variáveis de Estado ---
+  // Todas as variáveis de estado e funções de inicialização permanecem as mesmas.
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final User? _currentUser = FirebaseAuth.instance.currentUser;
-
   bool _isArtist = false;
   Plan _artistPlan = Plan.free;
   int _pendingAppointmentsCount = 0;
   bool _isLoading = true;
-
-  // Variáveis para o anúncio
   BannerAd? _bannerAd;
   bool _isBannerAdLoaded = false;
-
-  // Controlador para o PageView (o nosso carrossel)
-  // viewportFraction: 0.85 faz com que um pouco da página seguinte e anterior apareça nos lados.
   final PageController _pageController = PageController(viewportFraction: 0.85);
 
   @override
   void initState() {
     super.initState();
-    _checkUserRoleAndPendingAppointments();
+    _checkUserRoleAndPlan();
     _loadBannerAd();
   }
 
   @override
   void dispose() {
     _bannerAd?.dispose();
-    _pageController
-        .dispose(); // É crucial limpar o controlador para libertar memória.
+    _pageController.dispose();
     super.dispose();
   }
 
-  /// Carrega um banner de anúncio do AdMob.
   void _loadBannerAd() {
     final adUnitId = 'ca-app-pub-3940256099942544/6300978111';
     _bannerAd = BannerAd(
@@ -76,23 +63,19 @@ class _HomeScreenState extends State<HomeScreen> {
       listener: BannerAdListener(
         onAdLoaded: (ad) => setState(() => _isBannerAdLoaded = true),
         onAdFailedToLoad: (ad, err) {
-          print('BannerAd failed to load: $err');
           ad.dispose();
         },
       ),
     )..load();
   }
 
-  /// Verifica se o utilizador é um artista, qual o seu plano, e conta os agendamentos pendentes.
-  Future<void> _checkUserRoleAndPendingAppointments() async {
+  Future<void> _checkUserRoleAndPlan() async {
     if (_currentUser == null) {
       setState(() => _isLoading = false);
       return;
     }
-
     final studioDoc =
         await _firestore.collection('studios').doc(_currentUser!.uid).get();
-
     if (studioDoc.exists) {
       _isArtist = true;
       final data = studioDoc.data()!;
@@ -106,16 +89,16 @@ class _HomeScreenState extends State<HomeScreen> {
           .get();
       _pendingAppointmentsCount = pendingSnapshot.docs.length;
     }
-
     if (mounted) {
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final bool shouldShowAd = !_isArtist || _artistPlan == Plan.free;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('PC Studio',
@@ -123,17 +106,33 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: Column(
+        // A Column principal que organiza a tela verticalmente.
         children: [
           // Banner de notificação para artistas.
           if (_isArtist && _pendingAppointmentsCount > 0)
             _buildPendingAppointmentsBanner(),
 
-          // Secção principal, que agora é o nosso carrossel de estilos.
-          Expanded(
-            child: _buildStylesSection(),
+          // Secção de título para os estilos.
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Estilos em Destaque",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+            ),
           ),
 
-          // Container do anúncio condicional na parte inferior.
+          // --- ALTERAÇÃO PRINCIPAL AQUI ---
+          // A secção de estilos agora é chamada diretamente, SEM o widget Expanded.
+          // Isto permite que o SizedBox dentro dela dite a altura.
+          _buildStylesSection(),
+
+          // O Spacer ocupa todo o espaço vertical restante, empurrando o anúncio para baixo.
+          const Spacer(),
+
+          // O container do anúncio condicional.
           if (_isBannerAdLoaded && shouldShowAd)
             Container(
               alignment: Alignment.center,
@@ -146,10 +145,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Constrói o banner de alerta para o artista.
   Widget _buildPendingAppointmentsBanner() {
     return GestureDetector(
-      onTap: () => widget.onNavigateToPage(2), // Navega para a aba "Agenda"
+      onTap: () => widget.onNavigateToPage(2),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(12),
@@ -161,12 +159,10 @@ class _HomeScreenState extends State<HomeScreen> {
             const Icon(Icons.notification_important, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                'Você tem $_pendingAppointmentsCount solicitações pendentes!',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
+                child: Text(
+                    'Você tem $_pendingAppointmentsCount solicitações pendentes!',
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold))),
             const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
           ],
         ),
@@ -182,55 +178,54 @@ class _HomeScreenState extends State<HomeScreen> {
         if (snapshot.hasError)
           return const Center(child: Text('Ocorreu um erro.'));
         if (snapshot.connectionState == ConnectionState.waiting || _isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const SizedBox(
+              height: 300, child: Center(child: CircularProgressIndicator()));
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
-          return const Center(child: Text('Nenhum estilo encontrado.'));
+          return const SizedBox
+              .shrink(); // Retorna um widget vazio se não houver estilos
 
         final styles = snapshot.data!.docs
             .map((doc) =>
                 TattooStyle.fromFirestore(doc.data() as Map<String, dynamic>))
             .toList();
 
-        // Um Stack é usado para sobrepor as setas de navegação ao carrossel.
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            // O PageView é o widget que cria o efeito de carrossel.
-            PageView.builder(
-              controller: _pageController,
-              itemCount: styles.length,
-              itemBuilder: (context, index) {
-                // Cada item do PageView é construído pela nossa função auxiliar.
-                return _buildStylePage(context, styles[index]);
-              },
-            ),
-            // Botão de seta para a esquerda.
-            Positioned(
-              left: 0,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.white70),
-                onPressed: () {
-                  _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
+        // O carrossel está dentro de um SizedBox para controlar a sua altura.
+        return SizedBox(
+          height:
+              300, // Altura definida para o carrossel. Ajuste este valor conforme necessário.
+          width: double.infinity, // Ocupa a largura total.
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              PageView.builder(
+                controller: _pageController,
+                itemCount: styles.length,
+                itemBuilder: (context, index) {
+                  return _buildStylePage(context, styles[index]);
                 },
               ),
-            ),
-            // Botão de seta para a direita.
-            Positioned(
-              right: 0,
-              child: IconButton(
-                icon:
-                    const Icon(Icons.arrow_forward_ios, color: Colors.white70),
-                onPressed: () {
-                  _pageController.nextPage(
+              Positioned(
+                left: 0,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white70),
+                  onPressed: () => _pageController.previousPage(
                       duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
-                },
+                      curve: Curves.easeInOut),
+                ),
               ),
-            ),
-          ],
+              Positioned(
+                right: 0,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white70),
+                  onPressed: () => _pageController.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -249,7 +244,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       child: Container(
-        // Margens para criar o efeito de "espreitar" as outras páginas.
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
@@ -265,7 +259,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 errorBuilder: (context, error, stack) =>
                     const Center(child: Icon(Icons.image_not_supported)),
               ),
-              // Gradiente escuro na parte inferior para garantir a legibilidade do texto.
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -276,7 +269,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // Nome do estilo posicionado na parte inferior.
               Positioned(
                 bottom: 20,
                 left: 20,
