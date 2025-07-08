@@ -1,42 +1,16 @@
 {
-  "flutter": {
-    "platforms": {
-      "android": {
-        "default": {
-          "projectId": "pcstudioapp-b3e6f",
-          "appId": "1:552455772523:android:e568d1cb6a460e2e48d42e",
-          "fileOutput": "android/app/google-services.json"
-        }
-      },
-      "dart": {
-        "lib/firebase_options.dart": {
-          "projectId": "pcstudioapp-b3e6f",
-          "configurations": {
-            "android": "1:552455772523:android:e568d1cb6a460e2e48d42e",
-            "ios": "1:552455772523:ios:1890e9caa3fb605948d42e",
-            "macos": "1:552455772523:ios:1890e9caa3fb605948d42e",
-            "web": "1:552455772523:web:c6be1319b906fc1148d42e",
-            "windows": "1:552455772523:web:b83b6e91c8bfb21248d42e"
-          }
-        }
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
       }
-    }
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint",
-        "npm --prefix \"$RESOURCE_DIR\" run build"
-      ]
-    }
-  ]
+    ]
+  }
 }

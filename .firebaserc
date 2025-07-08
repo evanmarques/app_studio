@@ -1,7 +1,5 @@
 {
   "projects": {
     "default": "pcstudioapp-b3e6f"
-  },
-  "targets": {},
-  "etags": {}
+  }
 }
